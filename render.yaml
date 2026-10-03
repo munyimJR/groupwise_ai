@@ -1,0 +1,30 @@
+# Render Blueprint — deploys the FastAPI service (the Next.js app goes to Vercel).
+# Render dashboard → New → Blueprint → select this repository.
+services:
+  - type: web
+    name: groupwise-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false # Supabase pooled connection string
+      - key: PUBLIC_APP_URL
+        sync: false # e.g. https://groupwise-ai.vercel.app
+      - key: CORS_ORIGINS
+        sync: false # same as PUBLIC_APP_URL
+      - key: SUPABASE_URL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DEMO_ENABLED
+        value: "true"
+      - key: LLM_MODEL
+        value: claude-opus-5-5

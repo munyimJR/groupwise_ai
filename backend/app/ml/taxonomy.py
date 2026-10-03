@@ -59,18 +59,20 @@ SUBCATEGORIES: dict[str, Subcategory] = {s.key: s for s in _TAXONOMY}
 CATEGORIES: list[str] = list(dict.fromkeys(s.category for s in _TAXONOMY))
 DISCRETIONARY_CATEGORIES = {"Food", "Entertainment", "Shopping", "Travel"}
 
+# Fixed per-category colours (colour follows the entity, never its rank). Seven validated
+# colour-blind-safe slots; categories without a slot render as neutral "Other" in charts.
 CATEGORY_COLORS = {
-    "Food": "#F59E0B",
-    "Groceries": "#16A34A",
-    "Transport": "#0057B8",
-    "Travel": "#0EA5E9",
-    "Housing": "#7C3AED",
-    "Utilities": "#64748B",
-    "Entertainment": "#DB2777",
-    "Education": "#0D9488",
-    "Shopping": "#EA580C",
-    "Health": "#DC2626",
-    "Other": "#94A3B8",
+    "Food": "#2a78d6",
+    "Transport": "#eb6834",
+    "Groceries": "#1baf7a",
+    "Housing": "#eda100",
+    "Utilities": "#e87ba4",
+    "Entertainment": "#008300",
+    "Travel": "#4a3aa7",
+    "Education": "#98a2b3",
+    "Shopping": "#98a2b3",
+    "Health": "#98a2b3",
+    "Other": "#98a2b3",
 }
 
 
