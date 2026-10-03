@@ -143,6 +143,7 @@ export function GoalProjectionChart({
   target,
   rateWeekly,
   scenarioRateWeekly,
+  daysLeft,
   height = 240,
 }: {
   weekly: { start: string; amount: number }[];
@@ -152,11 +153,12 @@ export function GoalProjectionChart({
   target: number;
   rateWeekly: number;
   scenarioRateWeekly?: number;
+  daysLeft: number;
   height?: number;
 }) {
   const start = new Date(`${startDate}T00:00:00`).getTime();
   const end = new Date(`${deadline}T00:00:00`).getTime();
-  const today = Date.now();
+  const today = end - Math.max(0, daysLeft) * 86400000;
   const rows: { t: number; actual?: number; projected?: number; scenario?: number }[] = [];
   let cum = 0;
   weekly.forEach((w) => {

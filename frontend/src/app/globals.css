@@ -103,6 +103,10 @@
     outline: 2px solid var(--color-brand-blue);
     outline-offset: 2px;
   }
+  /* Grid items may shrink below their content's min width (charts, long text) — no mobile overflow. */
+  .grid > * {
+    min-width: 0;
+  }
 }
 
 @utility tabular {

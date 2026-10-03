@@ -113,7 +113,7 @@ export function useGoals(id: string) {
 }
 
 export function useGoal(id: string, goalId: string) {
-  return useQuery({ queryKey: [...keys.group(id), "goal", goalId], queryFn: () => api<GoalPlan>(`/groups/${id}/goals/${goalId}`) });
+  return useQuery({ queryKey: [...keys.group(id), "goal", goalId], queryFn: () => api<GoalPlan>(`/groups/${id}/goals/${goalId}`), enabled: !!goalId });
 }
 
 export interface WhatIfInput {

@@ -171,7 +171,7 @@ export default function DashboardPage() {
               ) : (
                 <Card>
                   <CardHeading icon={Target} title="Shared goal" />
-                  <p className="text-sm text-ink-muted">Saving for a trip or a shared purchase? Set a goal and GroupWise projects whether you'll make it.</p>
+                  <p className="text-sm text-ink-muted">Saving for a trip or a shared purchase? Set a goal and GroupWise projects whether you&apos;ll make it.</p>
                   <LinkButton href={`/g/${groupId}/goals`} variant="soft" className="mt-3">
                     Create a goal
                   </LinkButton>

@@ -44,15 +44,18 @@ const LAST_GROUP = "gw:lastGroup";
 
 export function useCurrentGroupId(): string | null {
   const params = useParams<{ groupId?: string }>();
-  const [last, setLast] = useState<string | null>(null);
+  // The shell renders client-side only (after auth), so reading storage lazily is safe.
+  const [last] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(LAST_GROUP);
+    } catch {
+      return null;
+    }
+  });
   useEffect(() => {
     if (params.groupId) {
       try {
         localStorage.setItem(LAST_GROUP, params.groupId);
-      } catch {}
-    } else {
-      try {
-        setLast(localStorage.getItem(LAST_GROUP));
       } catch {}
     }
   }, [params.groupId]);
@@ -315,11 +318,17 @@ function BottomNav({ groupId }: { groupId: string | null }) {
 
 function DemoBanner() {
   const { user } = useAuth();
-  const hours = useMemo(() => (user?.expires_at ? Math.max(0, Math.round((new Date(user.expires_at).getTime() - Date.now()) / 3600000)) : null), [user]);
+  const resets = useMemo(
+    () =>
+      user?.expires_at
+        ? new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(new Date(user.expires_at))
+        : null,
+    [user],
+  );
   if (!user?.is_demo) return null;
   return (
     <div className="border-b border-brand-yellow-strong/40 bg-brand-yellow-soft px-4 py-1.5 text-center text-xs text-ink">
-      <strong>Demo sandbox</strong> — synthetic data only, private to you{hours !== null ? `, resets in ~${hours}h` : ""}. Add expenses freely.
+      <strong>Demo sandbox</strong> — synthetic data only, private to you{resets ? `, resets ${resets}` : ""}. Add expenses freely.
     </div>
   );
 }
