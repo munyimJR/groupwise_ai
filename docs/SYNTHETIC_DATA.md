@@ -28,8 +28,8 @@ Settlements come from a pairwise ledger: each member settles what they owe their
 
 | Group | Members | What the AI should find |
 |---|---|---|
-| **DIU CSE Squad** (friends, 150 days) | 5 | Weekend restaurant dining up ~25–35% in the last 30 days (Food +~30% excluding one-offs); a ৳16,500 sound-system rental (amount anomaly); a 3 AM ৳4,200 delivery (time anomaly); a duplicate ৳2,340 dinner; an older laptop repair reviewed as valid; Rafi fronts ~45% of costs while consuming ~20%; Tahsin settles slowly; the "Cox's Bazar Trip" goal (৳40,000) is behind |
-| **Mirpur Flat 7C** (roommates, 150 days) | 4 | Rent and utilities detected as recurring bills; an electricity recharge 3.4× normal; Sakib fronts rent; the Emergency Fund goal is on track |
+| **DIU CSE Squad** (friends, 150 days) | 5 | Weekend restaurant dining up ~25–35% in the last 30 days (Food +~30% excluding one-offs); a ৳16,500 sound-system rental (amount anomaly); a 3 AM ৳4,200 delivery (time anomaly); a duplicate ৳2,340 dinner; an older laptop repair reviewed as valid; Rony fronts ~45% of costs while consuming ~20%; Nahid settles slowly; the "Cox's Bazar Trip" goal (৳40,000) is behind |
+| **Mirpur Flat 7C** (roommates, 150 days) | 4 | Rent and utilities detected as recurring bills; an electricity recharge 3.4× normal; Asif fronts rent; the Emergency Fund goal is on track |
 | **Sajek Valley Tour** (trip, finished ~38 days ago) | 6 | Inactive group, so no forecast; open balances, where 5 simplified payments replace 15 pairwise ones |
 
 Every demo visitor gets these three groups **seeded through the same models as live data**. The categorizer labels descriptions (where it disagrees with the scenario's ground truth, the expense is stored as a human correction), and the anomaly detector scores every expense. Alerts older than 30 days are stored as already reviewed, as an active group would have done.

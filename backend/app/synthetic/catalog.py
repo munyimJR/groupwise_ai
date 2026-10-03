@@ -210,7 +210,7 @@ CATALOG: dict[str, dict[str, list[str]]] = {
 
 MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
           "November", "December"]
-PEOPLE = ["Rafi", "Nusrat", "Tahsin", "Mitu", "Sakib", "Riya", "Farhan", "Anika"]
+PEOPLE = ["Rony", "Galib", "Nahid", "Shuvo", "Asif", "Yousuf", "Akib", "Abrar"]
 
 
 def all_merchants() -> dict[str, str]:

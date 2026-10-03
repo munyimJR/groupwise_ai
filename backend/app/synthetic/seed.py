@@ -131,7 +131,7 @@ def seed_workspace(db: Session, user: User, today: datetime | None = None) -> li
 
 
 def create_demo_user(db: Session, ttl_hours: int) -> User:
-    user = User(id=new_id(), display_name="Ayaan Rahman", auth_provider="demo", is_demo=True,
+    user = User(id=new_id(), display_name="Polash", auth_provider="demo", is_demo=True,
                 avatar_color="#0057B8", expires_at=utc_now() + timedelta(hours=ttl_hours))
     db.add(user)
     db.flush()

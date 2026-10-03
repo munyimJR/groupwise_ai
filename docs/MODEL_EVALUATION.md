@@ -1,6 +1,6 @@
 # Model evaluation (synthetic-data simulation)
 
-Generated 2026-10-03 21:48 UTC by `python -m scripts.evaluate_models`. **All results come from synthetic data** — they show the methods work as designed on realistic simulated behaviour, not production performance.
+Generated 2026-10-03 22:43 UTC by `python -m scripts.evaluate_models`. **All results come from synthetic data** — they show the methods work as designed on realistic simulated behaviour, not production performance.
 
 ## 1. Expense categorization
 Model `tfidf-logreg-1.1` — 1,044 training examples, 34 subcategories. Test set: 245 examples built only from **merchants and phrasings never seen in training**.

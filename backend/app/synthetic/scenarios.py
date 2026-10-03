@@ -33,11 +33,11 @@ PRIMARY = "you"  # the signed-in demo user
 
 def friends_squad() -> GroupScenario:
     members = [
-        MemberSpec(PRIMARY, "Ayaan Rahman", 1.2, (3, 5), (0.9, 1.0), COLORS[0], is_primary_user=True),
-        MemberSpec("rafi", "Rafi Ahmed", 3.6, (3, 6), (0.95, 1.0), COLORS[1]),
-        MemberSpec("nusrat", "Nusrat Jahan", 1.0, (1, 2), (0.95, 1.0), COLORS[2]),
-        MemberSpec("tahsin", "Tahsin Karim", 0.6, (7, 11), (0.7, 0.9), COLORS[3]),
-        MemberSpec("mitu", "Mitu Akter", 0.45, (4, 6), (0.85, 1.0), COLORS[4]),
+        MemberSpec(PRIMARY, "Polash", 1.2, (3, 5), (0.9, 1.0), COLORS[0], is_primary_user=True),
+        MemberSpec("rony", "Rony", 3.6, (3, 6), (0.95, 1.0), COLORS[1]),
+        MemberSpec("galib", "Galib", 1.0, (1, 2), (0.95, 1.0), COLORS[2]),
+        MemberSpec("nahid", "Nahid", 0.6, (7, 11), (0.7, 0.9), COLORS[3]),
+        MemberSpec("shuvo", "Shuvo", 0.45, (4, 6), (0.85, 1.0), COLORS[4]),
     ]
     patterns = [
         PatternSpec("restaurant", 0.55, 850, 0.32, LUNCH_H, LUNCH_DOW, (0.6, 1.0), month_start_mult=1.15,
@@ -62,21 +62,21 @@ def friends_squad() -> GroupScenario:
     ]
     fixed = [
         # Main demo anomaly: plausible-but-unusual expense the group may confirm as valid.
-        FixedExpense(5, 18.5, "events", 16500, "Sound system rental for freshers' event", "rafi", None,
+        FixedExpense(5, 18.5, "events", 16500, "Sound system rental for freshers' event", "rony", None,
                      is_anomaly=True, anomaly_kind="amount"),
-        FixedExpense(17, 3.2, "food_delivery", 4200, "Foodpanda late night order", "tahsin", "Foodpanda",
-                     participants=[PRIMARY, "tahsin", "rafi"], is_anomaly=True, anomaly_kind="time"),
+        FixedExpense(17, 3.2, "food_delivery", 4200, "Foodpanda late night order", "nahid", "Foodpanda",
+                     participants=[PRIMARY, "nahid", "rony"], is_anomaly=True, anomaly_kind="time"),
         FixedExpense(11, 21.1, "restaurant", 2340, "Dinner at Star Kabab", PRIMARY, "Star Kabab",
-                     participants=[PRIMARY, "rafi", "nusrat", "tahsin"]),
+                     participants=[PRIMARY, "rony", "galib", "nahid"]),
         FixedExpense(11, 21.15, "restaurant", 2340, "Dinner at Star Kabab", PRIMARY, "Star Kabab",
-                     participants=[PRIMARY, "rafi", "nusrat", "tahsin"], is_anomaly=True, anomaly_kind="duplicate"),
-        FixedExpense(70, 16.0, "electronics", 9800, "Laptop repair for project laptop", "nusrat", "Ryans Computers",
+                     participants=[PRIMARY, "rony", "galib", "nahid"], is_anomaly=True, anomaly_kind="duplicate"),
+        FixedExpense(70, 16.0, "electronics", 9800, "Laptop repair for project laptop", "galib", "Ryans Computers",
                      is_anomaly=True, anomaly_kind="category", reviewed_valid=True),
     ]
     goals = [
         GoalSpec("Cox's Bazar Trip", "Winter trip for the whole squad — bus, hotel and food for 3 nights.",
                  40000, start_days_ago=45, duration_days=120, weekly_total=1850, weekly_noise=0.12, participation=0.9,
-                 contributor_weights={PRIMARY: 1.2, "rafi": 1.3, "nusrat": 1.0, "tahsin": 0.7, "mitu": 0.8}),
+                 contributor_weights={PRIMARY: 1.2, "rony": 1.3, "galib": 1.0, "nahid": 0.7, "shuvo": 0.8}),
     ]
     return GroupScenario("squad", "DIU CSE Squad", "Five CSE classmates sharing lunches, rides, outings and a trip fund.",
                          "friends", members, days=150, seed=20261, patterns=patterns, fixed=fixed, goals=goals,
@@ -85,10 +85,10 @@ def friends_squad() -> GroupScenario:
 
 def roommates_flat() -> GroupScenario:
     members = [
-        MemberSpec(PRIMARY, "Ayaan Rahman", 1.0, (3, 6), (0.9, 1.0), COLORS[0], is_primary_user=True),
-        MemberSpec("sakib", "Sakib Hasan", 1.3, (2, 4), (0.95, 1.0), COLORS[5]),
-        MemberSpec("farhan", "Farhan Kabir", 1.0, (2, 5), (0.9, 1.0), COLORS[6]),
-        MemberSpec("imran", "Imran Hossain", 0.8, (7, 12), (0.75, 0.95), COLORS[7]),
+        MemberSpec(PRIMARY, "Polash", 1.0, (3, 6), (0.9, 1.0), COLORS[0], is_primary_user=True),
+        MemberSpec("asif", "Asif", 1.3, (2, 4), (0.95, 1.0), COLORS[5]),
+        MemberSpec("akib", "Akib", 1.0, (2, 5), (0.9, 1.0), COLORS[6]),
+        MemberSpec("abrar", "Abrar", 0.8, (7, 12), (0.75, 0.95), COLORS[7]),
     ]
     patterns = [
         PatternSpec("supermarket", 0.32, 950, 0.3, DAY_H, {4: 1.6, 5: 1.4}, (1.0, 1.0), month_start_mult=1.3),
@@ -98,15 +98,15 @@ def roommates_flat() -> GroupScenario:
         PatternSpec("cafe_snacks", 0.12, 200, 0.4, SNACK_H, {}, (0.5, 1.0)),
     ]
     recurring = [
-        RecurringSpec("rent", 2, 28000, "sakib", "Flat rent {month}", None, 0.0, 1),
+        RecurringSpec("rent", 2, 28000, "asif", "Flat rent {month}", None, 0.0, 1),
         RecurringSpec("home_services", 2, 3000, PRIMARY, "Bua salary {month}", None, 0.0, 1),
-        RecurringSpec("internet", 5, 1200, "farhan", "Link3 wifi bill", "Link3", 0.0, 1),
-        RecurringSpec("gas", 8, 1080, "sakib", "Titas gas bill {month}", "Titas Gas", 0.0, 2),
+        RecurringSpec("internet", 5, 1200, "akib", "Link3 wifi bill", "Link3", 0.0, 1),
+        RecurringSpec("gas", 8, 1080, "asif", "Titas gas bill {month}", "Titas Gas", 0.0, 2),
         RecurringSpec("electricity", 11, 1750, PRIMARY, "DESCO prepaid recharge", "DESCO", 0.15, 2),
-        RecurringSpec("water", 14, 600, "imran", "WASA water bill", "Dhaka WASA", 0.05, 2),
+        RecurringSpec("water", 14, 600, "abrar", "WASA water bill", "Dhaka WASA", 0.05, 2),
     ]
     fixed = [
-        FixedExpense(9, 13.0, "electricity", 6400, "DESCO prepaid recharge", "farhan", "DESCO",
+        FixedExpense(9, 13.0, "electricity", 6400, "DESCO prepaid recharge", "akib", "DESCO",
                      is_anomaly=True, anomaly_kind="amount"),
     ]
     goals = [
@@ -120,12 +120,12 @@ def roommates_flat() -> GroupScenario:
 
 def sajek_trip() -> GroupScenario:
     members = [
-        MemberSpec(PRIMARY, "Ayaan Rahman", 1.0, (6, 9), (0.5, 0.8), COLORS[0], is_primary_user=True),
-        MemberSpec("rafi", "Rafi Ahmed", 1.4, (5, 8), (0.6, 0.9), COLORS[1]),
-        MemberSpec("nusrat", "Nusrat Jahan", 1.0, (4, 6), (0.7, 1.0), COLORS[2]),
-        MemberSpec("tahsin", "Tahsin Karim", 0.9, (12, 20), (0.5, 0.7), COLORS[3]),
-        MemberSpec("riya", "Riya Das", 1.0, (6, 9), (0.6, 0.9), COLORS[5]),
-        MemberSpec("sakib", "Sakib Hasan", 1.1, (7, 10), (0.5, 0.8), COLORS[6]),
+        MemberSpec(PRIMARY, "Polash", 1.0, (6, 9), (0.5, 0.8), COLORS[0], is_primary_user=True),
+        MemberSpec("rony", "Rony", 1.4, (5, 8), (0.6, 0.9), COLORS[1]),
+        MemberSpec("galib", "Galib", 1.0, (4, 6), (0.7, 1.0), COLORS[2]),
+        MemberSpec("nahid", "Nahid", 0.9, (12, 20), (0.5, 0.7), COLORS[3]),
+        MemberSpec("yousuf", "Yousuf", 1.0, (6, 9), (0.6, 0.9), COLORS[5]),
+        MemberSpec("asif", "Asif", 1.1, (7, 10), (0.5, 0.8), COLORS[6]),
     ]
     trip = (41, 38)  # active between 41 and 38 days ago
     patterns = [
@@ -137,15 +137,15 @@ def sajek_trip() -> GroupScenario:
                     templates=["Entry tickets", "Waterfall entry fee", "Tour guide fee", "Trekking guide"]),
     ]
     fixed = [
-        FixedExpense(42, 21.0, "bus_train", 9600, "Shyamoli bus tickets Dhaka to Khagrachari", "rafi",
+        FixedExpense(42, 21.0, "bus_train", 9600, "Shyamoli bus tickets Dhaka to Khagrachari", "rony",
                      "Shyamoli Paribahan"),
-        FixedExpense(41, 9.0, "tours_activities", 7500, "Chander gari rent day 1", "sakib", "Chander Gari"),
-        FixedExpense(41, 15.0, "accommodation", 14000, "Resort booking 2 nights at Megh Machang", "nusrat",
+        FixedExpense(41, 9.0, "tours_activities", 7500, "Chander gari rent day 1", "asif", "Chander Gari"),
+        FixedExpense(41, 15.0, "accommodation", 14000, "Resort booking 2 nights at Megh Machang", "galib",
                      "Megh Machang"),
         FixedExpense(39, 9.0, "tours_activities", 7500, "Chander gari rent day 3", PRIMARY, "Chander Gari"),
-        FixedExpense(38, 20.0, "bus_train", 9600, "Return bus tickets Khagrachari to Dhaka", "tahsin",
+        FixedExpense(38, 20.0, "bus_train", 9600, "Return bus tickets Khagrachari to Dhaka", "nahid",
                      "Shyamoli Paribahan"),
-        FixedExpense(40, 17.0, "clothing", 3600, "Matching t-shirts for the tour", "riya", None),
+        FixedExpense(40, 17.0, "clothing", 3600, "Matching t-shirts for the tour", "yousuf", None),
     ]
     return GroupScenario("trip", "Sajek Valley Tour", "Four-day trip to Sajek — six friends, one shared wallet.",
                          "trip", members, days=45, seed=20263, patterns=patterns, fixed=fixed,

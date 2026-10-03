@@ -84,7 +84,7 @@ function CreateGroupDialog() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="g-members">Add members by name (optional)</Label>
-            <Input id="g-members" placeholder="Rafi, Nusrat, Tahsin" value={members} onChange={(e) => setMembers(e.target.value)} />
+            <Input id="g-members" placeholder="Rony, Galib, Nahid" value={members} onChange={(e) => setMembers(e.target.value)} />
             <p className="text-xs text-ink-muted">Comma-separated. They can claim their spot later through the invite link.</p>
           </div>
           <DialogFooter>

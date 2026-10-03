@@ -52,7 +52,7 @@ EXAMPLES: dict[str, list[str]] = {
                  "who pays upfront", "who is slow to pay back", "how long do people take to settle",
                  "is anyone paying too much", "payment balance in the group"],
     "balances": ["who owes whom", "how much do i owe", "settle up", "what is my balance", "who owes me money",
-                 "how do we settle", "outstanding balances", "how much does rafi owe"],
+                 "how do we settle", "outstanding balances", "how much does rony owe"],
     "anomalies": ["anything unusual", "any suspicious expenses", "unusual transactions", "weird expense",
                   "any mistakes in expenses", "duplicate expense", "flagged expenses", "strange spending"],
     "health": ["how healthy are our finances", "what is our financial health score", "health score", "are we doing well",

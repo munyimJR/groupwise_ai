@@ -14,7 +14,7 @@
 | 8 | **What-If** → *Cut dining 15%* | "Real simulation on the forecast: savings per month, pressure, each member's burden, and the goal jumps above 100%. The assumption is shown." |
 | 9 | **Ask GroupWise** → "Why did our spending increase?" | "Grounded copilot: the answer cites facts [F1], [F2]…, and every figure is verified against the data. Here's the evidence panel, typed as fact, prediction, assumption or recommendation." |
 | 10 | Back to the dashboard → **Recommended action** | "The recommendation engine proposes reducing weekend dining *and simulates the outcome*: goal progress 74% → 106%. You can mark it helpful or dismiss it. AI recommends; the group decides." |
-| 11 | (Optional) **Group dynamics** | "Observable payments only: Rafi fronts most costs, so it suggests rotating the payer for big expenses. No judgments about people." |
+| 11 | (Optional) **Group dynamics** | "Observable payments only: Rony fronts most costs, so it suggests rotating the payer for big expenses. No judgments about people." |
 | 12 | (Optional) **Balances** | "Exact ledger: 4 payments settle everyone instead of 10. That part is a deterministic algorithm, not AI." |
 
 **Closing line:** *"GroupWise AI doesn't just tell groups where their money went. It helps them understand what is happening, anticipate what comes next, and make better financial decisions together."*
