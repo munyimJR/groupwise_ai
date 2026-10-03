@@ -1,0 +1,122 @@
+{
+  "generated_at": "2026-10-03 21:48 UTC",
+  "label": "Synthetic-data simulation",
+  "categorizer": {
+    "n_test": 245,
+    "subcategory": {
+      "accuracy": 0.8041,
+      "precision_macro": 0.8333,
+      "recall_macro": 0.7882,
+      "f1_macro": 0.797
+    },
+    "category": {
+      "accuracy": 0.8327,
+      "precision_macro": 0.8022,
+      "recall_macro": 0.7507,
+      "f1_macro": 0.7694,
+      "f1_weighted": 0.8298
+    },
+    "confident_share": 0.7347,
+    "accuracy_when_confident": 0.9778,
+    "low_confidence_threshold": 0.45,
+    "n_train": 1044,
+    "n_classes": 34,
+    "top_confusions": [
+      {
+        "true": "Household Supplies",
+        "predicted": "Electronics",
+        "count": 2
+      },
+      {
+        "true": "Clothing",
+        "predicted": "Electronics",
+        "count": 2
+      },
+      {
+        "true": "Electronics",
+        "predicted": "Household Supplies",
+        "count": 2
+      },
+      {
+        "true": "Restaurant",
+        "predicted": "Cafe & Snacks",
+        "count": 1
+      },
+      {
+        "true": "Fast Food",
+        "predicted": "Cafe & Snacks",
+        "count": 1
+      }
+    ],
+    "version": "tfidf-logreg-1.1"
+  },
+  "anomaly": {
+    "validation": {
+      "groups": 40,
+      "transactions": 14935,
+      "injected_anomalies": 241,
+      "precision": 0.855,
+      "recall": 0.9295,
+      "f1": 0.8907,
+      "false_positive_rate": 0.00259,
+      "confusion": {
+        "tp": 224,
+        "fp": 38,
+        "fn": 17,
+        "tn": 14656
+      },
+      "recall_by_kind": {
+        "amount": 0.853,
+        "category": 0.873,
+        "duplicate": 1.0,
+        "time": 1.0
+      }
+    },
+    "test": {
+      "groups": 40,
+      "transactions": 13690,
+      "injected_anomalies": 231,
+      "precision": 0.8871,
+      "recall": 0.9524,
+      "f1": 0.9186,
+      "false_positive_rate": 0.00208,
+      "confusion": {
+        "tp": 220,
+        "fp": 28,
+        "fn": 11,
+        "tn": 13431
+      },
+      "recall_by_kind": {
+        "amount": 0.883,
+        "category": 0.934,
+        "duplicate": 1.0,
+        "time": 1.0
+      }
+    }
+  },
+  "anomaly_version": "iforest-robust-1.2",
+  "anomaly_threshold": 0.6,
+  "forecast": {
+    "groups": 20,
+    "windows": 160,
+    "horizon_days": 7,
+    "mae_7day": 2902,
+    "rmse_7day": 3528,
+    "baseline_mean28": {
+      "mae_7day": 7673,
+      "rmse_7day": 9235
+    },
+    "baseline_lastweek": {
+      "mae_7day": 9447,
+      "rmse_7day": 12477
+    },
+    "mae_improvement_vs_mean28_pct": 62.2,
+    "weekly_mape": 0.28,
+    "bias_pct": 7.1,
+    "mae_daily": 1720,
+    "baseline_mae_daily": 1770,
+    "units": "taka",
+    "version": "seasonal-ets-1.0",
+    "note": "Evaluated on normal spending: injected anomalies are removed, as the product excludes unusual one-offs."
+  }
+}

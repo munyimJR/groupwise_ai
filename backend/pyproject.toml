@@ -1,0 +1,16 @@
+[project]
+name = "groupwise-ai-backend"
+version = "1.0.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 125
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["F", "E9", "B", "I"]
+ignore = ["B008", "B904", "B905"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
