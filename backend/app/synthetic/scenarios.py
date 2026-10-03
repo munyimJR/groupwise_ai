@@ -36,7 +36,7 @@ def friends_squad() -> GroupScenario:
         MemberSpec(PRIMARY, "Ayaan Rahman", 1.2, (3, 5), (0.9, 1.0), COLORS[0], is_primary_user=True),
         MemberSpec("rafi", "Rafi Ahmed", 3.6, (3, 6), (0.95, 1.0), COLORS[1]),
         MemberSpec("nusrat", "Nusrat Jahan", 1.0, (1, 2), (0.95, 1.0), COLORS[2]),
-        MemberSpec("tahsin", "Tahsin Karim", 0.9, (7, 11), (0.7, 0.9), COLORS[3]),
+        MemberSpec("tahsin", "Tahsin Karim", 0.6, (7, 11), (0.7, 0.9), COLORS[3]),
         MemberSpec("mitu", "Mitu Akter", 0.45, (4, 6), (0.85, 1.0), COLORS[4]),
     ]
     patterns = [
@@ -44,8 +44,8 @@ def friends_squad() -> GroupScenario:
                     month_end_mult=0.85,
                     templates=["Lunch at {m}", "{m} lunch for everyone", "Kacchi lunch", "Tehari lunch",
                                "Bhuna khichuri lunch", "Lunch with friends", "Biryani at {m}"]),
-        PatternSpec("restaurant", 0.30, 1800, 0.30, DINNER_H, WEEKEND_NIGHT_DOW, (0.8, 1.0), month_start_mult=1.2,
-                    recent_days=30, recent_rate_mult=1.4, recent_amount_mult=1.12,
+        PatternSpec("restaurant", 0.30, 1800, 0.30, DINNER_H, {3: 2.0, 4: 2.4, 5: 1.6, 6: 0.3, 0: 0.3, 1: 0.3, 2: 0.4},
+                    (0.8, 1.0), month_start_mult=1.2, recent_days=30, recent_rate_mult=1.45, recent_amount_mult=1.1,
                     templates=["Dinner at {m}", "{m} dinner", "Group dinner at {m}", "Weekend dinner",
                                "Buffet at {m}", "Thai food dinner", "Set menu dinner"]),
         PatternSpec("fast_food", 0.18, 1100, 0.38, DINNER_H, WEEKEND_NIGHT_DOW, (0.6, 1.0)),
@@ -75,12 +75,12 @@ def friends_squad() -> GroupScenario:
     ]
     goals = [
         GoalSpec("Cox's Bazar Trip", "Winter trip for the whole squad — bus, hotel and food for 3 nights.",
-                 40000, start_days_ago=45, duration_days=120, weekly_total=1850,
+                 40000, start_days_ago=45, duration_days=120, weekly_total=1850, weekly_noise=0.12, participation=0.9,
                  contributor_weights={PRIMARY: 1.2, "rafi": 1.3, "nusrat": 1.0, "tahsin": 0.7, "mitu": 0.8}),
     ]
     return GroupScenario("squad", "DIU CSE Squad", "Five CSE classmates sharing lunches, rides, outings and a trip fund.",
                          "friends", members, days=150, seed=20261, patterns=patterns, fixed=fixed, goals=goals,
-                         monthly_budget=45000)
+                         monthly_budget=45000, low_variance=True)
 
 
 def roommates_flat() -> GroupScenario:
@@ -91,8 +91,8 @@ def roommates_flat() -> GroupScenario:
         MemberSpec("imran", "Imran Hossain", 0.8, (7, 12), (0.75, 0.95), COLORS[7]),
     ]
     patterns = [
-        PatternSpec("supermarket", 0.22, 1400, 0.35, DAY_H, {4: 1.6, 5: 1.4}, (1.0, 1.0), month_start_mult=1.4),
-        PatternSpec("fresh_market", 0.30, 650, 0.35, ((7, 11, 1.0), (17, 20, 0.6)), {4: 2.5, 5: 1.2}, (1.0, 1.0)),
+        PatternSpec("supermarket", 0.32, 950, 0.3, DAY_H, {4: 1.6, 5: 1.4}, (1.0, 1.0), month_start_mult=1.3),
+        PatternSpec("fresh_market", 0.42, 480, 0.3, ((7, 11, 1.0), (17, 20, 0.6)), {4: 2.5, 5: 1.2}, (1.0, 1.0)),
         PatternSpec("household_supplies", 0.05, 450, 0.4, DAY_H, {}, (1.0, 1.0)),
         PatternSpec("food_delivery", 0.14, 850, 0.35, LATE_H, {3: 1.5, 4: 1.5}, (0.5, 1.0)),
         PatternSpec("cafe_snacks", 0.12, 200, 0.4, SNACK_H, {}, (0.5, 1.0)),
@@ -111,11 +111,11 @@ def roommates_flat() -> GroupScenario:
     ]
     goals = [
         GoalSpec("Emergency Fund", "A shared buffer for repairs, medical needs or a late rent month.",
-                 20000, start_days_ago=60, duration_days=120, weekly_total=1600),
+                 20000, start_days_ago=60, duration_days=120, weekly_total=1300, weekly_noise=0.12, participation=0.9),
     ]
     return GroupScenario("flat", "Mirpur Flat 7C", "Four roommates sharing rent, bills and groceries.", "roommates",
                          members, days=150, seed=20262, patterns=patterns, recurring=recurring, fixed=fixed,
-                         goals=goals, monthly_budget=60000)
+                         goals=goals, monthly_budget=60000, low_variance=True)
 
 
 def sajek_trip() -> GroupScenario:
@@ -149,7 +149,7 @@ def sajek_trip() -> GroupScenario:
     ]
     return GroupScenario("trip", "Sajek Valley Tour", "Four-day trip to Sajek — six friends, one shared wallet.",
                          "trip", members, days=45, seed=20263, patterns=patterns, fixed=fixed,
-                         settle_until_days_ago=30)
+                         settle_until_days_ago=30, low_variance=True)
 
 
 def demo_scenarios() -> list[GroupScenario]:
@@ -167,6 +167,7 @@ def eval_scenario(seed: int) -> GroupScenario:
     base = friends_squad() if rng.random() < 0.6 else roommates_flat()
     base.seed = 50_000 + seed
     base.key = f"eval-{seed}"
+    base.low_variance = False  # evaluation keeps full sampling noise
     base.days = rng.randint(110, 180)
     base.fixed = []  # drop demo anomalies; inject fresh ones below
     for p in base.patterns:

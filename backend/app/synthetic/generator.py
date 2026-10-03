@@ -22,7 +22,6 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 
 from ..core.splits import equal_split
-from ..ml.taxonomy import get_subcategory
 from .catalog import CATALOG, MONTHS, PEOPLE
 
 WEEKEND = {4, 5}  # Friday, Saturday
@@ -96,6 +95,7 @@ class GoalSpec:
     weekly_total: float  # average total contributed per week by the group
     contributor_weights: dict[str, float] | None = None
     weekly_noise: float = 0.35
+    participation: float = 0.8  # chance each member contributes in a given week
 
 
 @dataclass
@@ -113,6 +113,9 @@ class GroupScenario:
     goals: list[GoalSpec] = field(default_factory=list)
     settle_until_days_ago: int = 0  # stop settling after this point (leaves open balances)
     monthly_budget: float | None = None
+    # Demo groups use systematic (low-variance) sampling of event counts so the designed behaviour
+    # is visible whichever day the demo is opened; evaluation groups keep full Poisson noise.
+    low_variance: bool = False
 
 
 # ----------------------------------------------------------------------------- output types
@@ -233,10 +236,11 @@ def generate_group(sc: GroupScenario, today: datetime) -> GeneratedGroup:
                                    _payment_method(rng, amount), **kw))
 
     # 1) behavioural patterns
+    accumulators = [rng.random() for _ in sc.patterns]
     day = start_day
     while day <= end_day:
         days_ago = (end_day - day).days
-        for pat in sc.patterns:
+        for p_idx, pat in enumerate(sc.patterns):
             if pat.window and not (pat.window[1] <= days_ago <= pat.window[0]):
                 continue
             lam = pat.rate * pat.dow.get(day.weekday(), 1.0)
@@ -248,7 +252,13 @@ def generate_group(sc: GroupScenario, today: datetime) -> GeneratedGroup:
             if pat.recent_days and days_ago < pat.recent_days:
                 lam *= pat.recent_rate_mult
                 amount_mult = pat.recent_amount_mult
-            for _ in range(_poisson(rng, lam)):
+            if sc.low_variance:
+                accumulators[p_idx] += lam * rng.uniform(0.85, 1.15)
+                count = int(accumulators[p_idx])
+                accumulators[p_idx] -= count
+            else:
+                count = _poisson(rng, lam)
+            for _ in range(count):
                 lo, hi = pat.participants
                 k = max(2, min(len(members), round(rng.uniform(lo, hi) * len(members))))
                 parts = rng.sample(members, k)
@@ -337,8 +347,8 @@ def _simulate_goal(g: GoalSpec, members: list[str], end_day: date, today: dateti
         weekly = max(0.0, rng.gauss(g.weekly_total, g.weekly_total * g.weekly_noise))
         total_w = sum(weights.values())
         for member, w in weights.items():
-            if rng.random() < 0.8:  # not everyone contributes every week
-                amount = _round_amount(weekly * w / total_w / 0.8, 50)
+            if rng.random() < g.participation:  # not everyone contributes every week
+                amount = _round_amount(weekly * w / total_w / g.participation, 50)
                 when = _at(week_start + timedelta(days=rng.randint(0, 6)), rng.uniform(18, 23))
                 if when <= today and when.date() >= start:
                     contributions.append(GenContribution(member, int(amount * 100), when))

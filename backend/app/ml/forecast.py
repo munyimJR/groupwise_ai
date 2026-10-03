@@ -285,7 +285,7 @@ def forecast_group(txns: list[SpendTxn], as_of: date, horizon: int = 7, with_bac
     drivers: list[dict] = []
     # weekday seasonality driver
     combined_dow = np.zeros(7)
-    for c, p in model.categories.items():
+    for p in model.categories.values():
         combined_dow += p["level"] * p["dow"]
     if combined_dow.sum() > 0:
         rel = combined_dow / combined_dow.mean()
