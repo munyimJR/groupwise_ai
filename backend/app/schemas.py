@@ -16,7 +16,8 @@ class SignupIn(BaseModel):
 
 
 class LoginIn(BaseModel):
-    email: EmailStr
+    # Not validated as an address: an unknown or malformed email simply fails as "incorrect".
+    email: str = Field(min_length=1, max_length=255)
     password: str = Field(min_length=1, max_length=128)
 
 

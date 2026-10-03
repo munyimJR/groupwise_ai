@@ -20,9 +20,13 @@ export function configureApi(tokenGetter: TokenGetter, unauthorized: () => void)
 function messageFrom(detail: unknown, fallback: string): string {
   if (typeof detail === "string") return detail;
   if (Array.isArray(detail) && detail.length) {
+    // FastAPI validation errors → short, human messages
     const first = detail[0] as { msg?: string; loc?: (string | number)[] };
-    const field = first.loc?.slice(-1)[0];
-    return field ? `${String(field).replace(/_/g, " ")}: ${first.msg}` : first.msg ?? fallback;
+    const field = String(first.loc?.slice(-1)[0] ?? "").replace(/_/g, " ");
+    const msg = (first.msg ?? "").replace(/^Value error, /, "");
+    if (/valid email/i.test(msg)) return "Please enter a valid email address.";
+    if (/at least \d+ character/i.test(msg) && field) return `${field[0].toUpperCase()}${field.slice(1)} is too short.`;
+    return field ? `${field[0].toUpperCase()}${field.slice(1)}: ${msg.charAt(0).toLowerCase()}${msg.slice(1)}` : msg || fallback;
   }
   return fallback;
 }
