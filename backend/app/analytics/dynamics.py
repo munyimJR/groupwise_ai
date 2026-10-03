@@ -103,7 +103,7 @@ def _fifo_delays(snap: GroupSnapshot, since: datetime) -> dict[str, dict]:
 
 def dynamics_report(snap: GroupSnapshot, me_member_id: str | None = None) -> dict:
     base = memo(snap, "dynamics", lambda: _report(snap))
-    if me_member_id is None:
+    if me_member_id is None or base.get("status") != "ok":
         return base
     return {**base, "members": [{**m, "is_you": m["member_id"] == me_member_id} for m in base["members"]]}
 

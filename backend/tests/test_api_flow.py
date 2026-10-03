@@ -87,7 +87,12 @@ def test_validation_errors(client):
     r = client.post(f"/api/groups/{gid}/expenses", headers=auth(tok),
                     json={"description": "x", "amount": 50, "payer_member_id": "nope", "participant_ids": [me]})
     assert r.status_code == 400
-    # empty group: AI features return graceful states, not errors
+    # empty group: every intelligence endpoint returns a graceful state, never a server error
+    for path in ("dashboard", "insights", "analytics/spending", "balances", "forecast", "dynamics", "health", "goals",
+                 "anomalies", "settlements", "expenses"):
+        r = client.get(f"/api/groups/{gid}/{path}", headers=auth(tok))
+        assert r.status_code == 200, (path, r.text)
+    assert client.post(f"/api/groups/{gid}/what-if", headers=auth(tok), json={}).status_code == 200
     assert client.get(f"/api/groups/{gid}/forecast", headers=auth(tok)).json()["status"] == "insufficient_data"
     assert client.post(f"/api/groups/{gid}/copilot", headers=auth(tok), json={"question": "why?"}).status_code == 200
 
@@ -164,3 +169,23 @@ def test_goal_creation_and_contribution(client, demo):
     after = client.post(f"/api/groups/{gid}/goals/{gid2}/contributions", headers=auth(tok),
                         json={"member_id": me, "amount": 1500}).json()
     assert after["saved"] == 150000
+
+
+def test_sparse_group_every_endpoint_and_intent(client):
+    tok = _signup(client, "sparse@example.com", "Sparse")
+    gid = client.post("/api/groups", json={"name": "Tiny", "member_names": ["Bo"]}, headers=auth(tok)).json()["id"]
+    members = client.get(f"/api/groups/{gid}", headers=auth(tok)).json()["members_detail"]
+    ids = [m["id"] for m in members]
+    for desc, amt in (("Lunch at restaurant", 850), ("Uber to campus", 280)):
+        assert client.post(f"/api/groups/{gid}/expenses", headers=auth(tok), json={
+            "description": desc, "amount": amt, "payer_member_id": ids[0], "participant_ids": ids}).status_code == 201
+    for path in ("dashboard", "insights", "analytics/spending?days=7", "balances", "forecast?horizon=30", "dynamics", "health",
+                 "goals", "anomalies"):
+        r = client.get(f"/api/groups/{gid}/{path}", headers=auth(tok))
+        assert r.status_code == 200, (path, r.text)
+    for q in ("Why did our spending increase?", "Can we afford our trip?", "Which category increased the most?",
+              "What caused our financial pressure?", "Who is paying most?", "Who owes whom?", "Anything unusual?",
+              "How healthy are we?", "What can we change to reach our goal?", "summary"):
+        r = client.post(f"/api/groups/{gid}/copilot", headers=auth(tok), json={"question": q})
+        assert r.status_code == 200, (q, r.text)
+        assert r.json()["grounding"]["passed"], q

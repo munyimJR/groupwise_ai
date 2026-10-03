@@ -31,7 +31,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5">
       <PageHeader
-        eyebrow={`${TYPE_LABEL[data.group.group_type] ?? "Group"} · ${data.group.member_count} members`}
+        eyebrow={`${TYPE_LABEL[data.group.group_type] ?? "Group"} · ${data.group.member_count} member${data.group.member_count === 1 ? "" : "s"}`}
         title={data.group.name}
         subtitle="Your group's money at a glance — what happened, what's likely next, and what to do about it."
         actions={

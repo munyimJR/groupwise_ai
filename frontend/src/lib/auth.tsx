@@ -22,7 +22,8 @@ interface SessionResponse {
 }
 
 interface AuthState {
-  status: "loading" | "authenticated" | "anonymous";
+  /** "unreachable": a session exists but the API could not be reached (e.g. server waking up). */
+  status: "loading" | "authenticated" | "anonymous" | "unreachable";
   user: User | null;
   provider: Provider | null;
   signIn: (email: string, password: string) => Promise<void>;
@@ -52,6 +53,7 @@ function readStored(): StoredSession | null {
 
 function writeStored(s: StoredSession | null) {
   try {
+    localStorage.removeItem("gw:lastGroup"); // never carry navigation state across accounts
     if (s) localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
     else localStorage.removeItem(STORAGE_KEY);
   } catch {
@@ -123,8 +125,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         await loadMe();
       } catch (e) {
-        if (!cancelled && (e as ApiError).status !== 0) clear();
-        else if (!cancelled) setStatus("anonymous");
+        if (cancelled) return;
+        // Only a definite 401 ends the session; outages and cold starts must not log people out.
+        if ((e as ApiError).status === 401) clear();
+        else setStatus("unreachable");
       }
     })();
     return () => {

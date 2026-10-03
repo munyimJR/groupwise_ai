@@ -3,7 +3,7 @@
 import { CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { Button } from "@/components/ui/button";
@@ -21,8 +21,10 @@ export default function SignupPage() {
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(false);
 
+  const initialStatus = useRef(status);
   useEffect(() => {
-    if (status === "authenticated") router.replace("/groups");
+    if (initialStatus.current === "loading" && status !== "loading") initialStatus.current = status;
+    if (initialStatus.current === "authenticated") router.replace("/groups");
   }, [status, router]);
 
   const tooShort = password.length > 0 && password.length < 8;

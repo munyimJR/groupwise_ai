@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Users } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -25,6 +25,7 @@ export default function JoinPage() {
   const { code } = useParams<{ code: string }>();
   const { status } = useAuth();
   const router = useRouter();
+  const qc = useQueryClient();
   const [claim, setClaim] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const { data, isLoading, error } = useQuery({ queryKey: ["invite", code], queryFn: () => api<Preview>(`/invites/${code}`, { auth: false }), retry: false });
@@ -33,6 +34,7 @@ export default function JoinPage() {
     setBusy(true);
     try {
       const res = await api<{ group_id: string }>(`/invites/${code}/join`, { body: { claim_member_id: claim } });
+      await qc.invalidateQueries({ queryKey: ["groups"] });
       toast.success(`You joined ${data?.group_name}`);
       router.push(`/g/${res.group_id}`);
     } catch (e) {

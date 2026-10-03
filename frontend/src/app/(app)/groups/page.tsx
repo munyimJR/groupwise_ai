@@ -2,6 +2,7 @@
 
 import { AlertTriangle, Link2, Loader2, Plus, Users } from "lucide-react";
 import Link from "next/link";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,6 +29,7 @@ const TYPES = [
 
 function CreateGroupDialog() {
   const router = useRouter();
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [type, setType] = useState("friends");
@@ -42,6 +44,7 @@ function CreateGroupDialog() {
       const g = await api<GroupSummary>("/groups", {
         body: { name, group_type: type, description: description || null, member_names: members.split(",").map((m) => m.trim()).filter(Boolean) },
       });
+      await qc.invalidateQueries({ queryKey: ["groups"] });
       toast.success(`“${g.name}” created. Share the invite link from Members.`);
       router.push(`/g/${g.id}`);
     } catch (err) {

@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { DemoButton } from "@/components/auth/demo-button";
@@ -27,8 +27,11 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  // Only bounce visitors who arrive already signed in; sign-in and demo handle their own navigation.
+  const initialStatus = useRef(status);
   useEffect(() => {
-    if (status === "authenticated") router.replace(next);
+    if (initialStatus.current === "loading" && status !== "loading") initialStatus.current = status;
+    if (initialStatus.current === "authenticated") router.replace(next);
   }, [status, router, next]);
 
   async function submit(e: React.FormEvent) {

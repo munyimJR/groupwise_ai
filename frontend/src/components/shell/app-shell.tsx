@@ -59,7 +59,10 @@ export function useCurrentGroupId(): string | null {
       } catch {}
     }
   }, [params.groupId]);
-  return params.groupId ?? last;
+  const { data: groups } = useGroups();
+  if (params.groupId) return params.groupId;
+  // Only trust the remembered group if it belongs to the signed-in user.
+  return last && groups?.some((g) => g.id === last) ? last : null;
 }
 
 interface NavItem {
