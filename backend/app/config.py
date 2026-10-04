@@ -3,10 +3,13 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 DEV_JWT_SECRET = "dev-only-insecure-secret-change-me"
+# backend/.env, found no matter which directory the API is started from (later files win).
+ENV_FILES = (".env", Path(__file__).resolve().parents[1] / ".env")
 
 # GroupWise is designed for Bangladesh first. Expense timestamps are stored as
 # local wall-clock time (Asia/Dhaka, UTC+6, no DST) so weekday/weekend and
@@ -15,7 +18,7 @@ LOCAL_TZ = timezone(timedelta(hours=6), name="Asia/Dhaka")
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(env_file=ENV_FILES, env_file_encoding="utf-8", extra="ignore")
 
     app_env: str = "development"
     database_url: str = "sqlite:///./groupwise.db"

@@ -5,7 +5,7 @@ from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from ..analytics.dynamics import dynamics_report
 from ..analytics.forecasting import group_forecast
@@ -72,7 +72,8 @@ def dashboard(access: GroupAccess = Depends(group_access), db: Session = Depends
     goals = [plan_goal(snap, g) for g in snap.goals if g.status == "active"]
     dyn = dynamics_report(snap, me)
     _sync_insight_notifications(db, access, insights)
-    recent = db.scalars(select(Expense).where(Expense.group_id == access.group.id, Expense.is_deleted.is_(False))
+    recent = db.scalars(select(Expense).options(selectinload(Expense.splits))
+                        .where(Expense.group_id == access.group.id, Expense.is_deleted.is_(False))
                         .order_by(Expense.occurred_at.desc()).limit(6)).all()
     names = member_names(db, access.group.id)
     return {

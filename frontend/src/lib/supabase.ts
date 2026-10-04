@@ -1,9 +1,10 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// New projects issue a publishable key (sb_publishable_…); older ones a legacy anon key. Both are public.
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-/** Supabase Auth is used when configured; otherwise GroupWise's own API issues sessions. Only the public anon key is ever used here. */
+/** Supabase Auth is used when configured; otherwise GroupWise's own API issues sessions. Only a public key is ever used here. */
 export const supabaseEnabled = Boolean(url && anonKey);
 
 let client: SupabaseClient | null = null;

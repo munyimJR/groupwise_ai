@@ -6,9 +6,9 @@ Any Docker host works for the API (Railway, Fly.io, Koyeb, Google Cloud Run, Hug
 ## 1. Supabase
 
 1. Create a project at supabase.com (choose a region near Bangladesh, e.g. Singapore).
-2. **Database URL:** Project Settings → Database → *Connection pooling* → mode **Transaction** (port 6543). Copy the URI and fill in your database password. This is `DATABASE_URL`.
+2. **Database URL:** Project Settings → Database → *Connection pooling* → mode **Transaction** (port 6543) or **Session** (port 5432). The *Direct connection* host (`db.<ref>.supabase.co`) is IPv6-only and fails on many networks. Copy the URI and fill in your database password. This is `DATABASE_URL`.
 3. **Auth (optional):** Authentication → Providers → Email (enabled by default). For a frictionless hackathon demo you can turn off *Confirm email*.
-   Copy the **Project URL** (`SUPABASE_URL`) and the **anon public** key (`NEXT_PUBLIC_SUPABASE_ANON_KEY`). Never use the service-role key in either app.
+   Copy the **Project URL** (`SUPABASE_URL`) and the **publishable** key (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`; older projects: legacy anon key as `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Never use the service-role key in either app.
 4. Tables are created automatically when the API starts, and RLS is enabled on all of them. To create them ahead of time, run `supabase/schema.sql` in the SQL editor.
 
 > Skipping Supabase still gives you a working app: the API falls back to SQLite plus built-in accounts. Data then lives on the container's disk and resets on redeploy.
@@ -32,7 +32,7 @@ Any Docker host works for the API (Railway, Fly.io, Koyeb, Google Cloud Run, Hug
 1. Vercel → **Add New → Project** → import the repo → **Root Directory: `frontend`** (framework auto-detected: Next.js).
 2. Environment variables:
    - `BACKEND_URL` = `https://<service>.onrender.com` (no trailing slash)
-   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`: optional (Supabase Auth)
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: optional (Supabase Auth)
 3. Deploy. Open the URL → **Explore the live demo**.
 4. Put the URL in the README's *Live URL* section, and update `PUBLIC_APP_URL` / `CORS_ORIGINS` on Render if the domain changed.
 

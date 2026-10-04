@@ -33,6 +33,13 @@ from .generator import GeneratedGroup, generate_group
 from .scenarios import PRIMARY, demo_scenarios
 
 
+def _bulk_insert(db: Session, model, rows: list[dict], chunk: int = 500) -> None:
+    """Multi-row INSERT ... VALUES in chunks: one round trip per chunk instead of one per row,
+    which matters when the database is a remote Postgres (e.g. Supabase) rather than local SQLite."""
+    for i in range(0, len(rows), chunk):
+        db.execute(insert(model).values(rows[i:i + chunk]))
+
+
 def _seed_group(db: Session, user: User, gen: GeneratedGroup, today: datetime) -> Group:
     sc = gen.scenario
     first = min((e.occurred_at for e in gen.expenses), default=today)
@@ -84,10 +91,10 @@ def _seed_group(db: Session, user: User, gen: GeneratedGroup, today: datetime) -
             else:
                 row["anomaly_status"] = "flagged"
     if expense_rows:
-        db.execute(insert(Expense), expense_rows)
-        db.execute(insert(ExpenseSplit), split_rows)
+        _bulk_insert(db, Expense, expense_rows)
+        _bulk_insert(db, ExpenseSplit, split_rows)
     if gen.settlements:
-        db.execute(insert(Settlement), [
+        _bulk_insert(db, Settlement, [
             {"id": new_id(), "group_id": group.id, "from_member_id": member_ids[s.from_member],
              "to_member_id": member_ids[s.to_member], "amount_paisa": s.amount_paisa, "occurred_at": s.occurred_at,
              "note": "Settled via mobile wallet", "created_at": s.occurred_at - timedelta(hours=6)}
@@ -100,7 +107,7 @@ def _seed_group(db: Session, user: User, gen: GeneratedGroup, today: datetime) -
         db.add(goal)
         db.flush()
         if g.contributions:
-            db.execute(insert(GoalContribution), [
+            _bulk_insert(db, GoalContribution, [
                 {"id": new_id(), "goal_id": goal.id, "member_id": member_ids[c.member], "amount_paisa": c.amount_paisa,
                  "occurred_at": c.occurred_at, "note": None, "created_at": c.occurred_at - timedelta(hours=6)}
                 for c in g.contributions])

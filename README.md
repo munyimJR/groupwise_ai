@@ -227,7 +227,7 @@ cp .env.example .env.local    # BACKEND_URL=http://127.0.0.1:8000
 | `LLM_MODEL` / `LLM_EFFORT` | Claude model and effort | `claude-opus-5-5` / `low` |
 | `CORS_ORIGINS`, `PUBLIC_APP_URL` | Web origin and invite-link base URL | `http://localhost:3000` |
 
-**Frontend (`frontend/.env.local`):** `BACKEND_URL`, plus optional `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (public anon key only).
+**Frontend (`frontend/.env.local`):** `BACKEND_URL`, plus optional `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (public publishable key only; legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` also works).
 
 ## 15. Run commands
 
