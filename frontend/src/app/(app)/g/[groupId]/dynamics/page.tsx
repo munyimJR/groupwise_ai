@@ -50,7 +50,7 @@ export default function DynamicsPage() {
       <div className="grid gap-5 xl:grid-cols-[1fr_380px]">
         <Card>
           <CardHeading icon={ArrowLeftRight} title="Paid upfront vs. consumed" subtitle={`Last ${data.window_days} days`} action={<ProvenanceBadge kind="fact" />} />
-          <LegendRow items={[{ label: "Share of upfront payments", color: "#0057b8" }, { label: "Share of what the group consumed", color: "#86b6ef" }]} />
+          <LegendRow items={[{ label: "Share of upfront payments", color: "#0057b8" }, { label: "Share of what the group consumed", color: "#3987e5" }]} />
           <ul className="mt-4 space-y-4">
             {members.map((m) => (
               <li key={m.member_id}>
@@ -74,7 +74,7 @@ export default function DynamicsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-[#f1f4f8]">
-                      <div className="h-full rounded-full bg-[#86b6ef]" style={{ width: `${(m.consumed_share_pct / maxShare) * 100}%` }} />
+                      <div className="h-full rounded-full bg-[#3987e5]" style={{ width: `${(m.consumed_share_pct / maxShare) * 100}%` }} />
                     </div>
                     <span className="tabular w-24 text-right text-xs text-ink">used {m.consumed_share_pct.toFixed(0)}%</span>
                   </div>

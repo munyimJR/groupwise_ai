@@ -57,7 +57,7 @@ export function InsightCard({ insight, defaultOpen = false, compact = false }: {
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}
-            className="inline-flex items-center gap-1 rounded-md text-xs font-semibold text-brand-blue hover:text-brand-blue-deep"
+            className="tap-target inline-flex items-center gap-1 rounded-md text-xs font-semibold text-brand-blue hover:text-brand-blue-deep"
           >
             Why? <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
           </button>
@@ -79,7 +79,7 @@ export function InsightCard({ insight, defaultOpen = false, compact = false }: {
                   ))}
                 </ul>
               )}
-              <p className="text-[11px] text-ink-muted">Method: {insight.method}</p>
+              <p className="text-xs text-ink-muted">Method: {insight.method}</p>
             </div>
           )}
         </div>
@@ -88,7 +88,7 @@ export function InsightCard({ insight, defaultOpen = false, compact = false }: {
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 pl-12">
         <ConfidenceMeter level={insight.confidence.level} basis={compact ? undefined : insight.confidence.basis} />
         {insight.action && (
-          <Link href={insight.action.link} className="group inline-flex items-center gap-1 text-[13px] font-semibold text-brand-blue hover:text-brand-blue-deep">
+          <Link href={insight.action.link} className="tap-target group inline-flex items-center gap-1 text-[13px] font-semibold text-brand-blue hover:text-brand-blue-deep">
             {compact ? "Open" : "Take action"}
             <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
           </Link>

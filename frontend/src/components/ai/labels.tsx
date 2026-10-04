@@ -20,7 +20,7 @@ export function ProvenanceBadge({ kind, className, withTooltip = true }: { kind:
   const s = STYLES[kind];
   const Icon = s.icon;
   const badge = (
-    <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold", s.cls, className)}>
+    <span className={cn("inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold", s.cls, className)}>
       <Icon className="size-3" aria-hidden />
       {s.label}
     </span>
@@ -38,7 +38,7 @@ export function ConfidenceMeter({ level, basis, className }: { level: "high" | "
   const bars = level === "high" ? 3 : level === "medium" ? 2 : 1;
   const label = `${level[0].toUpperCase()}${level.slice(1)} confidence`;
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-[11px] font-semibold text-ink-muted", className)} title={basis ? `${label} — ${basis}` : label}>
+    <span className={cn("inline-flex items-center gap-1.5 text-xs font-semibold text-ink-muted", className)} title={basis ? `${label} — ${basis}` : label}>
       <span className="flex items-end gap-[2px]" aria-hidden>
         {[1, 2, 3].map((i) => (
           <span key={i} className={cn("w-[3px] rounded-sm", i <= bars ? "bg-brand-blue" : "bg-line")} style={{ height: 4 + i * 3 }} />
@@ -51,5 +51,5 @@ export function ConfidenceMeter({ level, basis, className }: { level: "high" | "
 }
 
 export function MethodNote({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11px] leading-snug text-ink-muted">Method: {children}</p>;
+  return <p className="text-xs leading-snug text-ink-muted">Method: {children}</p>;
 }

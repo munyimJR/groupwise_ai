@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight, ArrowRight, CalendarClock, HeartPulse, Lightbulb, Plus, Receipt, Sparkles, Target, TrendingUp, Wallet } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, CalendarClock, HeartPulse, Lightbulb, Receipt, Target, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -34,16 +34,6 @@ export default function DashboardPage() {
         eyebrow={`${TYPE_LABEL[data.group.group_type] ?? "Group"} · ${data.group.member_count} member${data.group.member_count === 1 ? "" : "s"}`}
         title={data.group.name}
         subtitle="Your group's money at a glance — what happened, what's likely next, and what to do about it."
-        actions={
-          <>
-            <LinkButton href={`/g/${groupId}/ask`} variant="outline" className="hidden sm:inline-flex">
-              <Sparkles className="size-4 text-brand-blue" aria-hidden /> Ask GroupWise
-            </LinkButton>
-            <LinkButton href={`/g/${groupId}/add`}>
-              <Plus className="size-4" aria-hidden /> Add expense
-            </LinkButton>
-          </>
-        }
       />
 
       {!hasExpenses ? (
@@ -73,7 +63,7 @@ export default function DashboardPage() {
               sub={
                 <span className="flex flex-wrap items-center gap-2">
                   <BalanceTag net={data.me.net} size="sm" you />
-                  <Link href={`/g/${groupId}/balances`} className="text-xs font-semibold text-brand-blue hover:underline">
+                  <Link href={`/g/${groupId}/balances`} className="tap-target text-xs font-semibold text-brand-blue hover:underline">
                     Settle up
                   </Link>
                 </span>
@@ -88,7 +78,7 @@ export default function DashboardPage() {
                       <HeartPulse className="size-3.5 text-brand-blue" aria-hidden /> Financial health
                     </p>
                     <p className="text-lg font-extrabold capitalize text-ink">{data.health.band}</p>
-                    <p className="text-[11px] text-ink-muted">Prototype indicator</p>
+                    <p className="text-xs text-ink-muted">Prototype indicator</p>
                     <HealthExplainer health={data.health} />
                   </div>
                 </>
@@ -109,7 +99,7 @@ export default function DashboardPage() {
                   </p>
                   <div className="flex items-center justify-between gap-2">
                     <ConfidenceMeter level={fc.confidence!} />
-                    <Link href={`/g/${groupId}/forecast`} className="text-xs font-semibold text-brand-blue hover:underline">
+                    <Link href={`/g/${groupId}/forecast`} className="tap-target text-xs font-semibold text-brand-blue hover:underline">
                       Details
                     </Link>
                   </div>
@@ -130,7 +120,7 @@ export default function DashboardPage() {
                   title="AI insights"
                   subtitle="Every number below is computed from your group's own transactions."
                   action={
-                    <Link href={`/g/${groupId}/insights`} className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-brand-blue hover:underline">
+                    <Link href={`/g/${groupId}/insights`} className="tap-target inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-brand-blue hover:underline">
                       All insights <ArrowRight className="size-3.5" aria-hidden />
                     </Link>
                   }
@@ -185,7 +175,7 @@ export default function DashboardPage() {
                     title="Group dynamics"
                     subtitle="Who fronts the money — observable payments only"
                     action={
-                      <Link href={`/g/${groupId}/dynamics`} className="text-sm font-semibold text-brand-blue hover:underline">
+                      <Link href={`/g/${groupId}/dynamics`} className="tap-target text-sm font-semibold text-brand-blue hover:underline">
                         Open
                       </Link>
                     }
@@ -219,7 +209,7 @@ export default function DashboardPage() {
                   icon={Receipt}
                   title="Recent activity"
                   action={
-                    <Link href={`/g/${groupId}/transactions`} className="text-sm font-semibold text-brand-blue hover:underline">
+                    <Link href={`/g/${groupId}/transactions`} className="tap-target text-sm font-semibold text-brand-blue hover:underline">
                       See all
                     </Link>
                   }

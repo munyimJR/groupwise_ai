@@ -123,7 +123,7 @@ function GroupSwitcher({ currentId, className }: { currentId: string | null; cla
           <Users className="size-4" aria-hidden />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[10px] font-semibold uppercase tracking-wider text-ink-muted">Group</span>
+          <span className="block text-xs font-semibold uppercase tracking-wider text-ink-muted">Group</span>
           <span className="block truncate text-sm font-bold text-ink">{current?.name ?? "Choose a group"}</span>
         </span>
         <ChevronDown className="size-4 text-ink-muted" aria-hidden />
@@ -153,12 +153,12 @@ function NotificationBell() {
   return (
     <Link
       href="/notifications"
-      className="relative grid size-10 place-items-center rounded-xl text-ink hover:bg-brand-blue-soft"
+      className="relative grid size-10 place-items-center rounded-xl text-ink hover:bg-brand-blue-soft pointer-coarse:size-11"
       aria-label={unread ? `Notifications, ${unread} unread` : "Notifications"}
     >
       <Bell className="size-5" aria-hidden />
       {unread > 0 && (
-        <span className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-bad px-1 text-[10px] font-bold leading-4 text-white">
+        <span className="absolute right-1.5 top-1.5 grid min-w-4 place-items-center rounded-full bg-bad px-1 text-xs font-bold leading-4 text-white">
           {unread > 9 ? "9+" : unread}
         </span>
       )}
@@ -172,7 +172,7 @@ function UserMenu() {
   if (!user) return null;
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<button type="button" className="rounded-full" aria-label="Account menu" />}>
+      <DropdownMenuTrigger render={<button type="button" className="tap-target rounded-full" aria-label="Account menu" />}>
         <MemberAvatar name={user.display_name} color={user.avatar_color} size={36} />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
@@ -208,7 +208,7 @@ function Sidebar({ groupId }: { groupId: string | null }) {
     { href: "/how-it-works", label: "How the AI works", icon: BookOpen },
   ];
   return (
-    <aside className="sticky top-0 hidden h-dvh w-[264px] shrink-0 flex-col border-r border-line bg-white lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-[264px] shrink-0 flex-col border-r border-line bg-white lg:flex" aria-label="Sidebar">
       <div className="px-5 pb-4 pt-5">
         <Link href={groupId ? `/g/${groupId}` : "/groups"} aria-label="GroupWise AI home">
           <Logo />
@@ -230,14 +230,14 @@ function Sidebar({ groupId }: { groupId: string | null }) {
       <nav className="mt-3 flex-1 overflow-y-auto px-3 pb-4" aria-label="Main">
         {sections.map((s) => (
           <div key={s.title} className="mt-3">
-            <p className="px-3 pb-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-ink-muted">{s.title}</p>
+            <p className="px-3 pb-1 text-xs font-bold uppercase tracking-[0.12em] text-ink-muted">{s.title}</p>
             {s.items.map((item) => (
               <NavLink key={item.href} item={item} active={isActive(pathname, item)} />
             ))}
           </div>
         ))}
         <div className="mt-3">
-          <p className="px-3 pb-1 text-[10.5px] font-bold uppercase tracking-[0.12em] text-ink-muted">Account</p>
+          <p className="px-3 pb-1 text-xs font-bold uppercase tracking-[0.12em] text-ink-muted">Account</p>
           {globalItems.map((item) => (
             <NavLink key={item.href} item={item} active={isActive(pathname, item)} />
           ))}
@@ -261,7 +261,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-brand-yellow-strong" aria-hidden />}
       <Icon className={cn("size-[18px]", active ? "text-brand-blue" : "text-ink-muted")} aria-hidden />
       {item.label}
-      {item.badge && <span className="ml-auto rounded-md bg-brand-yellow px-1.5 py-0.5 text-[10px] font-bold text-ink">{item.badge}</span>}
+      {item.badge && <span className="ml-auto rounded-md bg-brand-yellow px-1.5 py-0.5 text-xs font-bold text-ink">{item.badge}</span>}
     </Link>
   );
 }
@@ -304,7 +304,7 @@ function BottomNav({ groupId }: { groupId: string | null }) {
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={cn("flex min-w-14 flex-col items-center gap-0.5 rounded-xl px-2 pb-1.5 pt-1 text-[11px] font-semibold", active ? "text-brand-blue" : "text-ink-muted")}
+                className={cn("flex min-w-14 flex-col items-center gap-0.5 rounded-xl px-2 pb-1.5 pt-1 text-xs font-semibold", active ? "text-brand-blue" : "text-ink-muted")}
               >
                 <span className={cn("grid h-7 w-12 place-items-center rounded-full", active && "bg-brand-blue-soft")}>
                   <Icon className="size-5" aria-hidden />
@@ -339,13 +339,21 @@ function DemoBanner() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const groupId = useCurrentGroupId();
   return (
-    <div className="flex min-h-dvh bg-surface">
+    <div className="flex min-h-dvh bg-surface pt-[env(safe-area-inset-top)]">
+      <a
+        href="#main"
+        className="sr-only z-[60] rounded-lg bg-brand-yellow px-4 py-2 font-semibold text-ink focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to main content
+      </a>
+      {/* installed-app status-bar backdrop (iOS notch / Dynamic Island) */}
+      <div className="fixed inset-x-0 top-0 z-40 h-[env(safe-area-inset-top)] bg-white" aria-hidden />
       <Sidebar groupId={groupId} />
       <div className="flex min-w-0 flex-1 flex-col">
         <DemoBanner />
-        <header className="sticky top-0 z-30 border-b border-line bg-white/90 backdrop-blur">
+        <header className="sticky top-[env(safe-area-inset-top)] z-30 border-b border-line bg-white/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-3 px-4 sm:px-6">
-            <Link href={groupId ? `/g/${groupId}` : "/groups"} className="lg:hidden" aria-label="GroupWise AI home">
+            <Link href={groupId ? `/g/${groupId}` : "/groups"} className="tap-target lg:hidden" aria-label="GroupWise AI home">
               <LogoMark className="size-9" />
             </Link>
             <div className="min-w-0 flex-1 lg:max-w-xs">
@@ -363,7 +371,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </Link>
               )}
               {groupId && (
-                <Link href={`/g/${groupId}/ask`} className="grid size-10 place-items-center rounded-xl text-brand-blue hover:bg-brand-blue-soft sm:hidden" aria-label="Ask GroupWise">
+                <Link href={`/g/${groupId}/ask`} className="grid size-11 place-items-center rounded-xl text-brand-blue hover:bg-brand-blue-soft sm:hidden" aria-label="Ask GroupWise">
                   <Sparkles className="size-5" aria-hidden />
                 </Link>
               )}
@@ -372,7 +380,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
-        <main id="main" className="mx-auto w-full max-w-[1240px] flex-1 px-4 pb-28 pt-5 sm:px-6 lg:pb-12 lg:pt-7">
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-[1240px] flex-1 px-4 pb-28 pt-5 outline-none sm:px-6 lg:pb-12 lg:pt-7">
           {children}
         </main>
       </div>

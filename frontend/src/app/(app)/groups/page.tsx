@@ -17,6 +17,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { relativeTime, taka } from "@/lib/format";
 import { useGroups } from "@/lib/queries";
+import { selectClass } from "@/lib/utils";
 import type { GroupSummary } from "@/lib/types";
 
 const TYPES = [
@@ -70,7 +71,7 @@ function CreateGroupDialog() {
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="g-type">Type</Label>
-            <select id="g-type" value={type} onChange={(e) => setType(e.target.value)} className="h-10 w-full rounded-lg border border-input bg-white px-3 text-sm">
+            <select id="g-type" value={type} onChange={(e) => setType(e.target.value)} className={selectClass}>
               {TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
                   {t.label}
@@ -183,7 +184,7 @@ export default function GroupsPage() {
             <Link key={g.id} href={`/g/${g.id}`} className="card-surface group flex flex-col gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)]">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-brand-blue">{TYPES.find((t) => t.value === g.group_type)?.label ?? "Group"}</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-brand-blue">{TYPES.find((t) => t.value === g.group_type)?.label ?? "Group"}</p>
                   <h2 className="truncate text-lg font-extrabold text-ink group-hover:text-brand-blue-deep">{g.name}</h2>
                   {g.description && <p className="line-clamp-2 text-xs text-ink-muted">{g.description}</p>}
                 </div>
@@ -191,11 +192,11 @@ export default function GroupsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3 rounded-xl bg-surface p-3">
                 <div>
-                  <p className="text-[11px] text-ink-muted">Spent · 30 days</p>
+                  <p className="text-xs text-ink-muted">Spent · 30 days</p>
                   <p className="tabular text-lg font-extrabold text-ink">{taka(g.total_30d)}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] text-ink-muted">Your balance</p>
+                  <p className="text-xs text-ink-muted">Your balance</p>
                   <BalanceTag net={g.my_net} size="sm" you />
                 </div>
               </div>

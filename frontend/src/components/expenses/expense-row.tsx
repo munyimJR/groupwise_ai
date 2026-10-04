@@ -50,12 +50,12 @@ export function AnomalyChip({ expense }: { expense: Expense }) {
   const s = expense.anomaly.status;
   if (s === "flagged")
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-bad-soft px-2 py-0.5 text-[11px] font-semibold text-bad">
+      <span className="inline-flex items-center gap-1 rounded-full bg-bad-soft px-2 py-0.5 text-xs font-semibold text-bad">
         <AlertTriangle className="size-3" aria-hidden /> Unusual · review
       </span>
     );
   if ((s === "valid" || s === "dismissed") && (expense.anomaly.score ?? 0) >= 0.6)
-    return <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-semibold text-ink-muted">Reviewed</span>;
+    return <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-ink-muted">Reviewed</span>;
   return null;
 }
 
@@ -78,7 +78,7 @@ export function ExpenseRow({ expense, groupId, dense = false }: { expense: Expen
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
         <span className="tabular text-sm font-bold text-ink">{taka(expense.amount, { decimals: true })}</span>
-        {dense ? <span className="text-[11px] text-ink-muted">{dayLabel(expense.occurred_at)}</span> : <AnomalyChip expense={expense} />}
+        {dense ? <span className="text-xs text-ink-muted">{dayLabel(expense.occurred_at)}</span> : <AnomalyChip expense={expense} />}
       </div>
     </Link>
   );

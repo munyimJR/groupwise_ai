@@ -15,7 +15,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { fmtDateYear, likelihood, taka } from "@/lib/format";
 import { type WhatIfInput, useGoal, useGoals, useWhatIf } from "@/lib/queries";
-import { cn } from "@/lib/utils";
+import { cn, selectClass } from "@/lib/utils";
 import { categoryColor } from "@/lib/viz";
 
 const WEEKS_PER_MONTH = 30.44 / 7;
@@ -45,7 +45,7 @@ function SliderRow({ label, value, onChange, min = -50, max = 50, hint, color }:
         </span>
       </div>
       <Slider aria-label={`${label} change`} min={min} max={max} step={5} value={[value]} onValueChange={(v) => onChange(Array.isArray(v) ? v[0] : (v as number))} />
-      {hint && <p className="text-[11px] text-ink-muted">{hint}</p>}
+      {hint && <p className="text-xs text-ink-muted">{hint}</p>}
     </div>
   );
 }
@@ -107,7 +107,7 @@ function WhatIfInner() {
       />
       <div className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
         {presets.map((p) => (
-          <button key={p.label} type="button" onClick={p.apply} className="shrink-0 rounded-full border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink hover:border-brand-blue hover:bg-brand-blue-soft">
+          <button key={p.label} type="button" onClick={p.apply} className="shrink-0 rounded-full border border-line bg-white px-3 py-1.5 text-sm font-semibold text-ink transition-colors hover:border-brand-blue hover:bg-brand-blue-soft active:bg-brand-blue-soft pointer-coarse:min-h-11">
             {p.label}
           </button>
         ))}
@@ -122,7 +122,7 @@ function WhatIfInner() {
           {activeGoals.length > 0 && (
             <div className="space-y-1.5">
               <Label htmlFor="wf-goal">Goal to test against</Label>
-              <select id="wf-goal" value={effectiveGoal ?? ""} onChange={(e) => setGoalId(e.target.value)} className="h-10 w-full rounded-lg border border-input bg-white px-3 text-sm">
+              <select id="wf-goal" value={effectiveGoal ?? ""} onChange={(e) => setGoalId(e.target.value)} className={selectClass}>
                 {activeGoals.map((x) => (
                   <option key={x.goal_id} value={x.goal_id}>
                     {x.title}
@@ -301,7 +301,7 @@ function WhatIfInner() {
               </table>
             </div>
             <div className="mt-3 space-y-1">
-              <p className="flex flex-wrap items-center gap-2 text-[11px] text-ink-muted">
+              <p className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
                 <ProvenanceBadge kind="assumption" withTooltip={false} /> {data.assumption}
               </p>
               <MethodNote>{data.method}</MethodNote>
@@ -317,7 +317,7 @@ function Compare({ label, before, after, better }: { label: string; before: stri
   const same = before === after;
   return (
     <div className="rounded-xl bg-surface p-3">
-      <p className="text-[11px] font-semibold text-ink-muted">{label}</p>
+      <p className="text-xs font-semibold text-ink-muted">{label}</p>
       <p className="tabular mt-1 flex flex-wrap items-center gap-1.5 text-sm text-ink-muted">
         {before}
         <ArrowRight className="size-3.5" aria-hidden />

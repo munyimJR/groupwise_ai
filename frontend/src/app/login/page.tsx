@@ -7,6 +7,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { DemoButton } from "@/components/auth/demo-button";
+import { PasswordInput } from "@/components/auth/password-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,7 +62,7 @@ function LoginForm() {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-11" />
+          <PasswordInput id="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="h-11" />
         </div>
         {error && (
           <p role="alert" className="rounded-xl bg-bad-soft px-3 py-2 text-sm text-bad">

@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { fmtDateYear } from "@/lib/format";
 import { useGroup, useInvalidateGroup } from "@/lib/queries";
+import { selectClass } from "@/lib/utils";
 import type { GroupDetail } from "@/lib/types";
 
 export default function MembersPage() {
@@ -201,7 +202,7 @@ function SettingsCard({ group, busy, onSave }: { group: GroupDetail; busy: boole
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="s-type">Type</Label>
-          <select id="s-type" value={type} onChange={(e) => setType(e.target.value)} className="h-10 w-full rounded-lg border border-input bg-white px-3 text-sm">
+          <select id="s-type" value={type} onChange={(e) => setType(e.target.value)} className={selectClass}>
             <option value="friends">Friends</option>
             <option value="roommates">Roommates</option>
             <option value="trip">Trip</option>

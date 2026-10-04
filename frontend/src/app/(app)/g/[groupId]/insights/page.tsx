@@ -58,7 +58,7 @@ function SpendingTab({ groupId }: { groupId: string }) {
               type="button"
               aria-pressed={days === d}
               onClick={() => setDays(d)}
-              className={cn("rounded-lg px-3 py-1.5 text-sm font-semibold", days === d ? "bg-brand-yellow text-ink" : "text-ink-muted hover:text-ink")}
+              className={cn("rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors pointer-coarse:min-h-10", days === d ? "bg-brand-yellow text-ink" : "text-ink-muted hover:text-ink")}
             >
               {d} days
             </button>
@@ -133,7 +133,7 @@ function SpendingTab({ groupId }: { groupId: string }) {
           <ul className="flex h-40 items-end gap-2" aria-label="Spending by weekday">
             {data.by_weekday.map((d) => (
               <li key={d.dow} className="flex flex-1 flex-col items-center gap-1">
-                <span className="tabular text-[10px] font-semibold text-ink-muted">{taka(d.total).replace("৳", "")}</span>
+                <span className="tabular text-xs font-semibold text-ink-muted">{taka(d.total).replace("৳", "")}</span>
                 <span className="w-full max-w-6 rounded-t-[4px]" style={{ height: `${(d.total / maxDow) * 100}px`, background: ["Thu", "Fri", "Sat"].includes(d.dow) ? "#f5c400" : chart.primary }} />
                 <span className="text-xs font-semibold text-ink">{d.dow}</span>
               </li>

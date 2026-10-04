@@ -15,7 +15,7 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
           <p className="mt-1 text-sm text-ink-muted">{subtitle}</p>
           <div className="mt-7">{children}</div>
         </div>
-        <p className="text-center text-[11px] text-ink-muted">Hackathon prototype · synthetic data · not affiliated with any financial institution</p>
+        <p className="text-center text-xs text-ink-muted">Hackathon prototype · synthetic data · not affiliated with any financial institution</p>
       </div>
       <div className="relative hidden overflow-hidden bg-brand-blue-deep lg:block">
         <div className="absolute -right-20 -top-20 size-96 rounded-full bg-brand-yellow/90" aria-hidden />

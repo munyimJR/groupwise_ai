@@ -18,6 +18,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { fmtTime, fmtWeekday, taka } from "@/lib/format";
 import { useExpense, useGroup, useInvalidateGroup } from "@/lib/queries";
+import { selectClass } from "@/lib/utils";
 import type { Expense } from "@/lib/types";
 
 const METHOD_LABEL: Record<string, string> = { mobile_wallet: "Mobile wallet", cash: "Cash", card: "Card", bank_transfer: "Bank transfer" };
@@ -173,7 +174,7 @@ export default function ExpenseDetailPage() {
                 <span className="flex items-center gap-2.5 text-sm font-medium text-ink">
                   <MemberAvatar name={p.name} size={30} color={group?.members_detail.find((m) => m.id === p.member_id)?.avatar_color} />
                   {p.name}
-                  {p.member_id === e.payer_member_id && <span className="rounded-full bg-brand-yellow-soft px-2 py-0.5 text-[11px] font-bold">Paid</span>}
+                  {p.member_id === e.payer_member_id && <span className="rounded-full bg-brand-yellow-soft px-2 py-0.5 text-xs font-bold">Paid</span>}
                 </span>
                 <span className="tabular text-sm font-semibold text-ink">{taka(p.share, { decimals: true })}</span>
               </li>
@@ -232,7 +233,7 @@ function EditDialog({ expense, groupId, members, onSaved }: { expense: Expense; 
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="e-payer">Paid by</Label>
-            <select id="e-payer" value={payer} onChange={(e) => setPayer(e.target.value)} className="h-10 w-full rounded-lg border border-input bg-white px-3 text-sm">
+            <select id="e-payer" value={payer} onChange={(e) => setPayer(e.target.value)} className={selectClass}>
               {members.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.display_name}

@@ -39,7 +39,7 @@ export function RecommendationCard({ rec, groupId, variant = "hero" }: { rec: Re
         </span>
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex flex-wrap items-center gap-2">
-            {hero && <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-brand-blue-deep">Recommended action</span>}
+            {hero && <span className="text-xs font-bold uppercase tracking-[0.12em] text-brand-blue-deep">Recommended action</span>}
             <ProvenanceBadge kind="recommendation" />
           </div>
           <h3 className="text-[15px] font-bold leading-snug text-ink">{rec.title}</h3>
@@ -50,7 +50,7 @@ export function RecommendationCard({ rec, groupId, variant = "hero" }: { rec: Re
               {rec.expected_outcome}
             </p>
           )}
-          {rec.assumption && <p className="mt-2 text-[11px] text-ink-muted">Assumption: {rec.assumption}</p>}
+          {rec.assumption && <p className="mt-2 text-xs text-ink-muted">Assumption: {rec.assumption}</p>}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <LinkButton href={rec.link} size="sm" variant={hero ? "blue" : "outline"}>
               {rec.kind === "goal" ? "Simulate in What-If" : "Open"}

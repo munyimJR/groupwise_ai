@@ -13,7 +13,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Entertainment: "#008300",
   Travel: "#4a3aa7",
 };
-export const OTHER_COLOR = "#98a2b3";
+export const OTHER_COLOR = "#828ca0"; // ≥3:1 on white
 
 export function categoryColor(category: string): string {
   return CATEGORY_COLORS[category] ?? OTHER_COLOR;
@@ -34,11 +34,13 @@ export function foldCategories<T extends { category: string }>(rows: T[], value:
 
 export const chart = {
   grid: "#eef1f5",
-  axis: "#98a2b3",
+  axis: "#5d6678", // tick labels are text: ≥4.5:1
   ink: "#162033",
-  inkMuted: "#667085",
+  inkMuted: "#5d6678",
   primary: "#0057b8",
   primarySoft: "rgba(0, 87, 184, 0.10)",
+  secondaryMark: "#8a94a6", // de-emphasised series (daily bars), ≥3:1 on white
+  projected: "#3987e5", // projections, ≥3:1 on white
   highlight: "#ffd429",
   baseline: "#d0d5dd",
   surface: "#ffffff",

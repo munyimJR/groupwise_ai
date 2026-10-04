@@ -18,7 +18,7 @@ export function AnomalyScoreBar({ score }: { score: number }) {
       <div className="mt-1 h-2 overflow-hidden rounded-full bg-bad-soft" role="meter" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Anomaly score">
         <div className={cn("h-full rounded-full", pct >= 80 ? "bg-bad" : "bg-warn")} style={{ width: `${pct}%` }} />
       </div>
-      <p className="mt-1 text-[11px] text-ink-muted">Flag threshold 60% · compared with this group&apos;s own history</p>
+      <p className="mt-1 text-xs text-ink-muted">Flag threshold 60% · compared with this group&apos;s own history</p>
     </div>
   );
 }
@@ -61,7 +61,7 @@ export function AnomalyPanel({
       <AnomalyScoreBar score={score} />
       <p className="mb-2 mt-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">Why</p>
       <ReasonList reasons={reasons} />
-      <p className="mt-3 text-[11px] text-ink-muted">
+      <p className="mt-3 text-xs text-ink-muted">
         Method: Isolation Forest + robust statistics + rules. Unusual doesn&apos;t mean wrong — nothing is blocked; your group decides.
       </p>
       {onAction && (

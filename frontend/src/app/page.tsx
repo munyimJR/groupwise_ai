@@ -72,7 +72,7 @@ export default function LandingPage() {
             <Logo />
           </Link>
           <nav className="flex items-center gap-1 sm:gap-2" aria-label="Site">
-            <Link href="/how-it-works" className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-ink hover:bg-surface sm:block">
+            <Link href="/how-it-works" className="hidden rounded-lg px-3 py-2.5 text-sm font-semibold text-ink hover:bg-surface sm:block">
               How the AI works
             </Link>
             {status === "authenticated" ? (
@@ -81,7 +81,7 @@ export default function LandingPage() {
               </LinkButton>
             ) : (
               <>
-                <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold text-ink hover:bg-surface">
+                <Link href="/login" className="tap-target rounded-lg px-3 py-2.5 text-sm font-semibold text-ink hover:bg-surface">
                   Sign in
                 </Link>
                 <DemoButton size="default" label="Try demo" className="hidden sm:inline-flex" />
@@ -91,7 +91,7 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main>
+      <main id="main" tabIndex={-1} className="outline-none">
         <section className="relative overflow-hidden border-b border-line bg-gradient-to-b from-white to-surface">
           <div className="pointer-events-none absolute -right-24 -top-24 size-[420px] rounded-full bg-brand-yellow/30 blur-3xl" aria-hidden />
           <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
@@ -162,7 +162,7 @@ export default function LandingPage() {
             <ul className="grid gap-2 sm:grid-cols-2">
               {QUESTIONS.map((q) => (
                 <li key={q} className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5 text-sm font-semibold text-ink">
-                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-brand-yellow text-[11px] font-bold">?</span>
+                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-brand-yellow text-xs font-bold">?</span>
                   {q}
                 </li>
               ))}
@@ -182,7 +182,7 @@ export default function LandingPage() {
                   </span>
                   <h3 className="mt-3 text-base font-bold text-ink">{f.title}</h3>
                   <p className="mt-1 text-[13px] text-ink-muted">{f.body}</p>
-                  <p className="mt-auto pt-3 text-[11px] font-semibold text-brand-blue-deep">{f.method}</p>
+                  <p className="mt-auto pt-3 text-xs font-semibold text-brand-blue-deep">{f.method}</p>
                 </article>
               ))}
             </div>

@@ -45,13 +45,13 @@ export function SpendTrendChart({ data, days = 60, height = 220 }: { data: { dat
   const rows = data.slice(-days);
   return (
     <figure>
-      <LegendRow items={[{ label: "Daily spending", color: "#b9d2f2" }, { label: "7-day average", color: chart.primary, kind: "line" }]} />
+      <LegendRow items={[{ label: "Daily spending", color: chart.secondaryMark }, { label: "7-day average", color: chart.primary, kind: "line" }]} />
       <div style={{ height }} className="mt-2">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={rows} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke={chart.grid} />
-            <XAxis dataKey="date" tickFormatter={(d) => fmtDate(d)} tick={{ fontSize: 11, fill: chart.axis }} axisLine={{ stroke: chart.baseline }} tickLine={false} minTickGap={28} />
-            <YAxis tickFormatter={(v) => takaCompact(v)} tick={{ fontSize: 11, fill: chart.axis }} axisLine={false} tickLine={false} width={52} />
+            <XAxis dataKey="date" tickFormatter={(d) => fmtDate(d)} tick={{ fontSize: 12, fill: chart.axis }} axisLine={{ stroke: chart.baseline }} tickLine={false} minTickGap={28} />
+            <YAxis tickFormatter={(v) => takaCompact(v)} tick={{ fontSize: 12, fill: chart.axis }} axisLine={false} tickLine={false} width={52} />
             <Tooltip
               cursor={{ fill: "rgba(0,87,184,0.06)" }}
               content={({ active, payload }) =>
@@ -59,14 +59,14 @@ export function SpendTrendChart({ data, days = 60, height = 220 }: { data: { dat
                   <TooltipBox
                     title={fmtDate(String(payload[0].payload.date))}
                     rows={[
-                      { label: "Spent", value: taka(payload[0].payload.total), color: "#b9d2f2" },
+                      { label: "Spent", value: taka(payload[0].payload.total), color: chart.secondaryMark },
                       { label: "7-day average", value: taka(payload[0].payload.ma7), color: chart.primary, dash: true },
                     ]}
                   />
                 ) : null
               }
             />
-            <Bar dataKey="total" fill="#b9d2f2" radius={[4, 4, 0, 0]} maxBarSize={16} />
+            <Bar dataKey="total" fill={chart.secondaryMark} radius={[4, 4, 0, 0]} maxBarSize={16} />
             <Line dataKey="ma7" stroke={chart.primary} strokeWidth={2} dot={false} strokeLinecap="round" type="monotone" />
           </ComposedChart>
         </ResponsiveContainer>
@@ -95,13 +95,13 @@ export function ForecastChart({ daily, pressureDates, height = 240 }: { daily: F
             <XAxis
               dataKey="date"
               tickFormatter={(d, i) => `${rows[i]?.dow ?? ""} ${fmtDate(d).split(" ")[0]}${rows[i]?.pressure ? " ▲" : ""}`}
-              tick={{ fontSize: 11, fill: chart.axis }}
+              tick={{ fontSize: 12, fill: chart.axis }}
               axisLine={{ stroke: chart.baseline }}
               tickLine={false}
               interval={rows.length > 14 ? "preserveStartEnd" : 0}
               minTickGap={8}
             />
-            <YAxis tickFormatter={(v) => takaCompact(v)} tick={{ fontSize: 11, fill: chart.axis }} axisLine={false} tickLine={false} width={52} />
+            <YAxis tickFormatter={(v) => takaCompact(v)} tick={{ fontSize: 12, fill: chart.axis }} axisLine={false} tickLine={false} width={52} />
             <Tooltip
               cursor={{ fill: "rgba(0,87,184,0.06)" }}
               content={({ active, payload }) => {
@@ -186,7 +186,7 @@ export function GoalProjectionChart({
       <LegendRow
         items={[
           { label: "Saved so far", color: chart.primary, kind: "line" },
-          { label: "Projected (current pace)", color: "#86b6ef", kind: "line" },
+          { label: "Projected (current pace)", color: chart.projected, kind: "line" },
           ...(scenarioRateWeekly !== undefined ? [{ label: "What-If scenario", color: "#11805a", kind: "line" as const }] : []),
           { label: "Target", color: "#f5c400", kind: "line" },
         ]}
@@ -201,27 +201,27 @@ export function GoalProjectionChart({
               domain={[start, end]}
               scale="time"
               tickFormatter={(t) => new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(t))}
-              tick={{ fontSize: 11, fill: chart.axis }}
+              tick={{ fontSize: 12, fill: chart.axis }}
               axisLine={{ stroke: chart.baseline }}
               tickLine={false}
               minTickGap={30}
             />
-            <YAxis domain={[0, maxY]} tickFormatter={(v) => takaCompact(v)} tick={{ fontSize: 11, fill: chart.axis }} axisLine={false} tickLine={false} width={52} />
-            <ReferenceLine y={target} stroke="#f5c400" strokeWidth={2} label={{ value: `Target ${taka(target)}`, position: "insideTopLeft", fill: chart.ink, fontSize: 11 }} />
+            <YAxis domain={[0, maxY]} tickFormatter={(v) => takaCompact(v)} tick={{ fontSize: 12, fill: chart.axis }} axisLine={false} tickLine={false} width={52} />
+            <ReferenceLine y={target} stroke="#f5c400" strokeWidth={2} label={{ value: `Target ${taka(target)}`, position: "insideTopLeft", fill: chart.ink, fontSize: 12 }} />
             <Tooltip
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null;
                 const p = payload[0].payload as (typeof rows)[number];
                 const r: { label: string; value: string; color?: string }[] = [];
                 if (p.actual !== undefined) r.push({ label: "Saved", value: taka(p.actual), color: chart.primary });
-                if (p.projected !== undefined) r.push({ label: "Projected", value: taka(p.projected), color: "#86b6ef" });
+                if (p.projected !== undefined) r.push({ label: "Projected", value: taka(p.projected), color: chart.projected });
                 if (p.scenario !== undefined) r.push({ label: "Scenario", value: taka(p.scenario), color: "#11805a" });
                 return <TooltipBox title={new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(p.t))} rows={r} />;
               }}
             />
             <Area dataKey="actual" stroke="none" fill={chart.primarySoft} type="monotone" connectNulls={false} />
             <Line dataKey="actual" stroke={chart.primary} strokeWidth={2} dot={false} type="monotone" connectNulls={false} />
-            <Line dataKey="projected" stroke="#86b6ef" strokeWidth={2} strokeDasharray="6 4" dot={false} connectNulls />
+            <Line dataKey="projected" stroke={chart.projected} strokeWidth={2} strokeDasharray="6 4" dot={false} connectNulls />
             {scenarioRateWeekly !== undefined && <Line dataKey="scenario" stroke="#11805a" strokeWidth={2} dot={false} connectNulls />}
           </ComposedChart>
         </ResponsiveContainer>

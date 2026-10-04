@@ -111,7 +111,7 @@ export function AvatarStack({ members, max = 4 }: { members: { name: string; col
         <MemberAvatar key={m.name} name={m.name} color={m.color} size={26} ring />
       ))}
       {members.length > max && (
-        <span className="inline-grid size-[26px] place-items-center rounded-full bg-muted text-[10px] font-bold text-ink-muted ring-2 ring-white">+{members.length - max}</span>
+        <span className="inline-grid size-[26px] place-items-center rounded-full bg-muted text-xs font-bold text-ink-muted ring-2 ring-white">+{members.length - max}</span>
       )}
     </span>
   );

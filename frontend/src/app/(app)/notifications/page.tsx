@@ -70,7 +70,7 @@ export default function NotificationsPage() {
                     <span className="flex items-center gap-2">
                       <span className="text-sm font-bold text-ink">{n.title}</span>
                       {!n.is_read && (
-                        <span className="rounded-full bg-brand-blue px-1.5 text-[10px] font-bold text-white">
+                        <span className="rounded-full bg-brand-blue px-1.5 text-xs font-bold text-white">
                           New<span className="sr-only"> notification</span>
                         </span>
                       )}

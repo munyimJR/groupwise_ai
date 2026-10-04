@@ -38,7 +38,7 @@ function AnswerText({ text, onCite, active }: { text: string; onCite: (id: strin
             type="button"
             onClick={() => onCite(m[1])}
             className={cn(
-              "mx-0.5 inline-flex -translate-y-0.5 items-center rounded-md px-1.5 py-0 align-middle text-[10px] font-bold",
+              "mx-0.5 inline-flex -translate-y-0.5 items-center rounded-md px-1.5 py-0 align-middle text-xs font-bold",
               active === m[1] ? "bg-brand-blue text-white" : "bg-brand-blue-soft text-brand-blue-deep hover:bg-[#dbe8f8]",
             )}
             aria-label={`Show evidence ${m[1]}`}
@@ -71,35 +71,35 @@ function AssistantMessage({ answer, onFollowUp, hideNotice }: { answer: CopilotA
         />
         <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
           {answer.mode === "llm" ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#f1edfd] px-2 py-0.5 text-[11px] font-semibold text-[#4a3aa7]">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#f1edfd] px-2 py-0.5 text-xs font-semibold text-[#4a3aa7]">
               <Bot className="size-3" aria-hidden /> Worded by AI from verified facts
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#eef2f7] px-2 py-0.5 text-[11px] font-semibold text-[#344054]">
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#eef2f7] px-2 py-0.5 text-xs font-semibold text-[#344054]">
               <Bot className="size-3" aria-hidden /> Composed by GroupWise engine
             </span>
           )}
           {g.numbers_checked > 0 &&
             (g.passed ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-good-soft px-2 py-0.5 text-[11px] font-semibold text-good">
+              <span className="inline-flex items-center gap-1 rounded-full bg-good-soft px-2 py-0.5 text-xs font-semibold text-good">
                 <BadgeCheck className="size-3" aria-hidden /> {g.verified}/{g.numbers_checked} figures verified against your data
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-bad-soft px-2 py-0.5 text-[11px] font-semibold text-bad">
+              <span className="inline-flex items-center gap-1 rounded-full bg-bad-soft px-2 py-0.5 text-xs font-semibold text-bad">
                 <ShieldAlert className="size-3" aria-hidden /> Unverified figures removed
               </span>
             ))}
-          <span className="text-[11px] text-ink-muted">Intent: {answer.intent.label}</span>
+          <span className="text-xs text-ink-muted">Intent: {answer.intent.label}</span>
         </div>
         {answer.notice && !hideNotice && (
           <p className="mt-2 flex items-start gap-1.5 rounded-lg bg-brand-blue-softer px-2.5 py-2 text-xs text-ink">
             <Info className="mt-0.5 size-3.5 shrink-0 text-brand-blue" aria-hidden /> {answer.notice}
           </p>
         )}
-        <p className="mt-2 text-[11px] text-ink-muted">{answer.basis}</p>
+        <p className="mt-2 text-xs text-ink-muted">{answer.basis}</p>
         {answer.facts.length > 0 && (
           <div className="mt-2">
-            <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-deep">
+            <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="tap-target inline-flex items-center gap-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-deep">
               {open ? "Hide" : "Show"} evidence ({answer.facts.length})
               <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
             </button>
@@ -120,9 +120,9 @@ function AssistantMessage({ answer, onFollowUp, hideNotice }: { answer: CopilotA
           </div>
         )}
         {answer.follow_ups.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-3 flex flex-wrap gap-2">
             {answer.follow_ups.map((q) => (
-              <button key={q} type="button" onClick={() => onFollowUp(q)} className="rounded-full border border-line px-2.5 py-1 text-xs font-medium text-ink hover:border-brand-blue hover:bg-brand-blue-soft">
+              <button key={q} type="button" onClick={() => onFollowUp(q)} className="rounded-full border border-line px-3 py-1.5 text-xs font-medium text-ink transition-colors hover:border-brand-blue hover:bg-brand-blue-soft pointer-coarse:min-h-11">
                 {q}
               </button>
             ))}
@@ -178,7 +178,7 @@ export default function AskPage() {
             <p className="mb-3 text-sm font-semibold text-ink">Try asking</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {SUGGESTED.map((q) => (
-                <button key={q} type="button" onClick={() => send(q)} className="rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-sm font-medium text-ink hover:border-brand-blue hover:bg-brand-blue-soft">
+                <button key={q} type="button" onClick={() => send(q)} className="min-h-11 rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-sm font-medium text-ink transition-colors hover:border-brand-blue hover:bg-brand-blue-soft active:bg-brand-blue-soft">
                   {q}
                 </button>
               ))}
@@ -236,7 +236,7 @@ export default function AskPage() {
               }
             }}
             placeholder="Ask about spending, goals, forecasts, balances…"
-            className="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-[15px] text-ink outline-none placeholder:text-ink-muted"
+            className="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-2 py-2.5 text-base text-ink outline-none placeholder:text-ink-muted"
           />
           <Button type="submit" size="icon" disabled={!input.trim() || ask.isPending} aria-label="Send question">
             <SendHorizontal className="size-5" aria-hidden />

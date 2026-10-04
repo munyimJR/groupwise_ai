@@ -24,16 +24,16 @@ export function GoalBar({ goal }: { goal: GoalPlan }) {
   return (
     <div>
       <div className="relative h-3 overflow-hidden rounded-full bg-brand-blue-soft">
-        <div className="absolute inset-y-0 left-0 rounded-full bg-[#b9d2f2]" style={{ width: `${projected}%` }} />
+        <div className="absolute inset-y-0 left-0 rounded-full bg-[#3987e5]" style={{ width: `${projected}%` }} />
         <div className="absolute inset-y-0 left-0 rounded-full bg-brand-blue" style={{ width: `${saved}%` }} />
       </div>
-      <div className="mt-1.5 flex justify-between text-[11px] text-ink-muted">
+      <div className="mt-1.5 flex justify-between text-xs text-ink-muted">
         <span>
           <span className="mr-1 inline-block size-2 rounded-full bg-brand-blue align-middle" aria-hidden />
           Saved {taka(goal.saved)}
         </span>
         <span>
-          <span className="mr-1 inline-block size-2 rounded-full bg-[#b9d2f2] align-middle" aria-hidden />
+          <span className="mr-1 inline-block size-2 rounded-full bg-[#3987e5] align-middle" aria-hidden />
           Projected {taka(goal.projection.projected_amount)}
         </span>
       </div>
@@ -50,7 +50,7 @@ export function GoalMiniCard({ goal, groupId }: { goal: GoalPlan; groupId: strin
         icon={Target}
         title={goal.title}
         subtitle={`Target ${taka(goal.target)} by ${fmtDateYear(goal.deadline)}`}
-        action={<span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold", st.cls)}>
+        action={<span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold", st.cls)}>
           {good ? <CircleCheck className="size-3" aria-hidden /> : <TriangleAlert className="size-3" aria-hidden />}
           {st.label}
         </span>}
@@ -63,7 +63,7 @@ export function GoalMiniCard({ goal, groupId }: { goal: GoalPlan; groupId: strin
       <p className="mt-1 text-xs text-ink-muted">
         Simulated likelihood of reaching it on time: <strong className="text-ink">{likelihood(goal.projection.likelihood_pct)}</strong>
       </p>
-      <Link href={`/g/${groupId}/goals/${goal.goal_id}`} className="mt-3 inline-block text-sm font-semibold text-brand-blue hover:underline">
+      <Link href={`/g/${groupId}/goals/${goal.goal_id}`} className="tap-target mt-3 inline-block text-sm font-semibold text-brand-blue hover:underline">
         Open goal planner →
       </Link>
     </Card>

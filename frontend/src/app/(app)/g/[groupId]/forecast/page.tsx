@@ -30,7 +30,7 @@ export default function ForecastPage() {
                 type="button"
                 aria-pressed={horizon === h}
                 onClick={() => setHorizon(h)}
-                className={cn("rounded-lg px-3 py-1.5 text-sm font-semibold", horizon === h ? "bg-brand-yellow text-ink" : "text-ink-muted hover:text-ink")}
+                className={cn("rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors pointer-coarse:min-h-10", horizon === h ? "bg-brand-yellow text-ink" : "text-ink-muted hover:text-ink")}
               >
                 Next {h} days
               </button>

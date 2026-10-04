@@ -2,7 +2,7 @@
 
 import { Banknote, Check, CreditCard, Landmark, Loader2, Sparkles, Smartphone, Wand2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ProvenanceBadge } from "@/components/ai/labels";
@@ -47,10 +47,10 @@ function Suggestion({ p, onPick, overridden }: { p: Prediction; onPick: (sub: st
         <CategoryIcon category={p.category} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-brand-blue">
+            <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-brand-blue">
               <Sparkles className="size-3" aria-hidden /> {p.source === "feedback" ? "Learned from your group" : "AI suggestion"}
             </span>
-            {overridden && <span className="text-[11px] font-semibold text-ink-muted">(you chose a different category)</span>}
+            {overridden && <span className="text-xs font-semibold text-ink-muted">(you chose a different category)</span>}
           </div>
           <p className="text-[15px] font-bold text-ink">
             {p.category} › {p.subcategory_label} <span className="font-medium text-ink-muted">· {p.expense_type}</span>
@@ -71,13 +71,13 @@ function Suggestion({ p, onPick, overridden }: { p: Prediction; onPick: (sub: st
           {p.needs_confirmation && (
             <div className="mt-2">
               <p className="text-xs font-semibold text-warn">Not sure — please confirm the category:</p>
-              <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <div className="mt-1.5 flex flex-wrap gap-2">
                 {p.alternatives.map((a) => (
                   <button
                     key={a.subcategory}
                     type="button"
                     onClick={() => onPick(a.subcategory)}
-                    className="rounded-full border border-line bg-white px-2.5 py-1 text-xs font-semibold text-ink hover:border-brand-blue"
+                    className="rounded-full border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:border-brand-blue pointer-coarse:min-h-11"
                   >
                     {a.category} › {a.label}
                   </button>
@@ -109,6 +109,10 @@ export default function AddExpensePage() {
   const [showCategory, setShowCategory] = useState(false);
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ description?: string; amount?: string; participants?: string }>({});
+  const descRef = useRef<HTMLInputElement>(null);
+  const amountRef = useRef<HTMLInputElement>(null);
+  const participantsRef = useRef<HTMLDivElement>(null);
   const [flagged, setFlagged] = useState<{ expense: Expense; anomaly: AnomalyResult } | null>(null);
 
   const active = useMemo(() => group?.members_detail.filter((m) => m.status === "active") ?? [], [group]);
@@ -131,9 +135,14 @@ export default function AddExpensePage() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setFormError(null);
-    if (!description) return setFormError("Describe the expense.");
-    if (!(amountNum > 0)) return setFormError("Enter an amount greater than zero.");
-    if (!participants.length) return setFormError("Choose at least one person to split with.");
+    const errs: typeof fieldErrors = {};
+    if (!description) errs.description = "Describe what the expense was for, e.g. “Lunch at Kacchi Bhai”.";
+    if (!(amountNum > 0)) errs.amount = "Enter an amount greater than ৳0.";
+    if (!participants.length) errs.participants = "Choose at least one person to split this expense with.";
+    setFieldErrors(errs);
+    if (errs.description) return descRef.current?.focus();
+    if (errs.amount) return amountRef.current?.focus();
+    if (errs.participants) return participantsRef.current?.querySelector("button")?.focus();
     setBusy(true);
     try {
       const res = await api<{ expense: Expense; categorization: Prediction; anomaly: AnomalyResult }>(`/groups/${groupId}/expenses`, {
@@ -185,7 +194,10 @@ export default function AddExpensePage() {
                 <Wand2 className="size-4 text-brand-blue" aria-hidden /> What was it for?
               </Label>
               <Input
+                ref={descRef}
                 id="desc"
+                aria-invalid={!!fieldErrors.description}
+                aria-describedby={fieldErrors.description ? "desc-error" : undefined}
                 autoFocus
                 autoComplete="off"
                 maxLength={200}
@@ -194,10 +206,16 @@ export default function AddExpensePage() {
                 onChange={(e) => {
                   setText(e.target.value);
                   setSubOverride(null);
+                  if (fieldErrors.description) setFieldErrors((f) => ({ ...f, description: undefined }));
                 }}
                 className="h-12 text-base"
               />
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              {fieldErrors.description && (
+                <p id="desc-error" role="alert" className="text-sm text-bad">
+                  {fieldErrors.description}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-2 pt-1">
                 {EXAMPLES.map((ex) => (
                   <button
                     key={ex}
@@ -207,7 +225,7 @@ export default function AddExpensePage() {
                       setAmountTouched(false);
                       setSubOverride(null);
                     }}
-                    className="rounded-full bg-surface px-2.5 py-1 text-xs text-ink-muted hover:bg-brand-blue-soft hover:text-brand-blue-deep"
+                    className="rounded-full bg-surface px-3 py-1.5 text-xs text-ink-muted transition-colors hover:bg-brand-blue-soft hover:text-brand-blue-deep pointer-coarse:min-h-11"
                   >
                     {ex}
                   </button>
@@ -232,7 +250,7 @@ export default function AddExpensePage() {
                     <p className="text-xs text-ink-muted">Your choice is saved as feedback and remembered for similar expenses in this group.</p>
                   </div>
                 ) : (
-                  <button type="button" onClick={() => setShowCategory(true)} className="text-sm font-semibold text-brand-blue hover:underline">
+                  <button type="button" onClick={() => setShowCategory(true)} className="tap-target text-sm font-semibold text-brand-blue hover:underline">
                     Change category
                   </button>
                 )}
@@ -243,7 +261,10 @@ export default function AddExpensePage() {
               <div className="space-y-1.5">
                 <Label htmlFor="amount">Amount (৳)</Label>
                 <Input
+                  ref={amountRef}
                   id="amount"
+                  aria-invalid={!!fieldErrors.amount}
+                  aria-describedby={fieldErrors.amount ? "amount-error" : undefined}
                   inputMode="decimal"
                   type="number"
                   min="0.01"
@@ -253,9 +274,15 @@ export default function AddExpensePage() {
                   onChange={(e) => {
                     setAmountInput(e.target.value);
                     setAmountTouched(true);
+                    if (fieldErrors.amount) setFieldErrors((f) => ({ ...f, amount: undefined }));
                   }}
                   className="tabular h-12 text-lg font-bold"
                 />
+                {fieldErrors.amount && (
+                  <p id="amount-error" role="alert" className="text-sm text-bad">
+                    {fieldErrors.amount}
+                  </p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="when">Date & time</Label>
@@ -267,7 +294,7 @@ export default function AddExpensePage() {
           <Card className="space-y-4">
             <fieldset>
               <legend className="mb-2 text-sm font-semibold text-ink">Paid by</legend>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Paid by">
                 {active.map((m) => (
                   <button
                     key={m.id}
@@ -276,7 +303,7 @@ export default function AddExpensePage() {
                     aria-checked={payer === m.id}
                     onClick={() => setPayer(m.id)}
                     className={cn(
-                      "flex items-center gap-2 rounded-full border py-1 pl-1 pr-3 text-sm font-semibold transition-colors",
+                      "flex items-center gap-2 rounded-full border py-1 pl-1 pr-3 text-sm font-semibold transition-colors pointer-coarse:min-h-11",
                       payer === m.id ? "border-brand-blue bg-brand-blue-soft text-brand-blue-deep" : "border-line bg-white text-ink hover:border-brand-blue/40",
                     )}
                   >
@@ -292,13 +319,13 @@ export default function AddExpensePage() {
                 <legend className="text-sm font-semibold text-ink">Split equally between</legend>
                 <button
                   type="button"
-                  className="text-xs font-semibold text-brand-blue hover:underline"
+                  className="tap-target text-xs font-semibold text-brand-blue hover:underline"
                   onClick={() => setParticipants(participants.length === active.length ? [payer] : active.map((m) => m.id))}
                 >
                   {participants.length === active.length ? "Only payer" : "Everyone"}
                 </button>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div ref={participantsRef} className="flex flex-wrap gap-2" role="group" aria-label="Split equally between" aria-describedby={fieldErrors.participants ? "participants-error" : undefined}>
                 {active.map((m) => {
                   const on = participants.includes(m.id);
                   return (
@@ -307,9 +334,12 @@ export default function AddExpensePage() {
                       type="button"
                       role="checkbox"
                       aria-checked={on}
-                      onClick={() => setParticipants(on ? participants.filter((p) => p !== m.id) : [...participants, m.id])}
+                      onClick={() => {
+                        setParticipants(on ? participants.filter((p) => p !== m.id) : [...participants, m.id]);
+                        if (fieldErrors.participants) setFieldErrors((f) => ({ ...f, participants: undefined }));
+                      }}
                       className={cn(
-                        "flex items-center gap-2 rounded-full border py-1 pl-1 pr-3 text-sm font-semibold transition-colors",
+                        "flex items-center gap-2 rounded-full border py-1 pl-1 pr-3 text-sm font-semibold transition-colors pointer-coarse:min-h-11",
                         on ? "border-brand-yellow-strong bg-brand-yellow-soft text-ink" : "border-line bg-white text-ink-muted line-through decoration-1",
                       )}
                     >
@@ -319,6 +349,11 @@ export default function AddExpensePage() {
                   );
                 })}
               </div>
+              {fieldErrors.participants && (
+                <p id="participants-error" role="alert" className="mt-2 text-sm text-bad">
+                  {fieldErrors.participants}
+                </p>
+              )}
               <p className="mt-2 text-sm text-ink-muted">
                 {participants.length ? (
                   <>
@@ -332,7 +367,7 @@ export default function AddExpensePage() {
             </fieldset>
             <fieldset>
               <legend className="mb-2 text-sm font-semibold text-ink">Paid with</legend>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-label="Paid with">
                 {METHODS.map((m) => (
                   <button
                     key={m.value}
@@ -341,7 +376,7 @@ export default function AddExpensePage() {
                     aria-checked={method === m.value}
                     onClick={() => setMethod(m.value)}
                     className={cn(
-                      "flex items-center justify-center gap-1.5 rounded-xl border px-2 py-2 text-xs font-semibold",
+                      "flex min-h-10 items-center justify-center gap-1.5 rounded-xl border px-2 py-2 text-xs font-semibold transition-colors pointer-coarse:min-h-11",
                       method === m.value ? "border-brand-blue bg-brand-blue-soft text-brand-blue-deep" : "border-line bg-white text-ink",
                     )}
                   >

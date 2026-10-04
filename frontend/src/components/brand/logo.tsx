@@ -23,7 +23,7 @@ export function Logo({ className, compact = false }: { className?: string; compa
           <span className="text-[17px] font-extrabold tracking-tight text-ink">
             GroupWise <span className="text-brand-blue">AI</span>
           </span>
-          <span className="mt-1 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-ink-muted">Shared Financial Intelligence</span>
+          <span className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-ink-muted">Shared Financial Intelligence</span>
         </span>
       )}
     </span>

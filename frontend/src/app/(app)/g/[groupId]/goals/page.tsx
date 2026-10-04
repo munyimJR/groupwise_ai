@@ -41,20 +41,20 @@ export default function GoalsPage() {
                       {taka(g.target)} by {fmtDateYear(g.deadline)} · {g.days_left > 0 ? `${g.days_left} days left` : "deadline reached"}
                     </p>
                   </div>
-                  <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold", st.cls)}>{st.label}</span>
+                  <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-xs font-bold", st.cls)}>{st.label}</span>
                 </div>
                 <GoalBar goal={g} />
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-xl bg-surface p-2">
-                    <p className="text-[11px] text-ink-muted">Saved</p>
+                    <p className="text-xs text-ink-muted">Saved</p>
                     <p className="tabular font-bold text-ink">{g.progress_pct.toFixed(0)}%</p>
                   </div>
                   <div className="rounded-xl bg-surface p-2">
-                    <p className="text-[11px] text-ink-muted">Projected</p>
+                    <p className="text-xs text-ink-muted">Projected</p>
                     <p className="tabular font-bold text-ink">{g.projection.on_track_pct.toFixed(0)}%</p>
                   </div>
                   <div className="rounded-xl bg-surface p-2">
-                    <p className="text-[11px] text-ink-muted">Likelihood</p>
+                    <p className="text-xs text-ink-muted">Likelihood</p>
                     <p className="tabular font-bold text-ink">{likelihood(g.projection.likelihood_pct)}</p>
                   </div>
                 </div>

@@ -2,6 +2,10 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* The product is light-only by design: `dark:` styles apply only under an explicit .dark class,
+   never because the operating system is in dark mode. */
+@custom-variant dark (&:is(.dark *));
+
 /* GroupWise AI design system — yellow / white / blue, white-dominant.
    Yellow = brand surfaces, primary actions, highlights, selected states.
    Blue   = trust, navigation, headings, icons, structure.
@@ -38,12 +42,12 @@
   --color-brand-blue-soft: #e9f1fb;
   --color-brand-blue-softer: #f3f7fd;
   --color-ink: #162033;
-  --color-ink-muted: #667085;
+  --color-ink-muted: #5d6678; /* ≥5:1 on every surface incl. tinted chips */
   --color-surface: #f6f8fb;
   --color-line: #e6eaf0;
 
   /* Restrained semantic colours (always paired with an icon or text) */
-  --color-good: #11805a;
+  --color-good: #0f7a55;
   --color-good-soft: #e8f6ef;
   --color-warn: #b45309;
   --color-warn-soft: #fef4e2;
@@ -75,12 +79,12 @@
   --secondary: #eef2f7;
   --secondary-foreground: #162033;
   --muted: #eef2f7;
-  --muted-foreground: #667085;
+  --muted-foreground: #5d6678;
   --accent: #e9f1fb;
   --accent-foreground: #003b7a;
   --destructive: #c2350c;
   --border: #e6eaf0;
-  --input: #d5dbe4;
+  --input: #8a94a6; /* form-field boundary ≥3:1 (WCAG 1.4.11) */
   --ring: #0057b8;
   --radius: 0.75rem;
 }
@@ -92,12 +96,28 @@
   html {
     @apply font-sans;
     -webkit-tap-highlight-color: transparent;
+    /* keep keyboard-focused controls clear of the sticky header and mobile bottom nav */
+    scroll-padding-top: 6rem;
+    scroll-padding-bottom: 7rem;
+  }
+  /* Tailwind v4 resets buttons to the default cursor; every clickable control shows a pointer */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  select:not(:disabled),
+  summary,
+  label[for] {
+    cursor: pointer;
+  }
+  button,
+  a {
+    touch-action: manipulation;
   }
   body {
     @apply bg-background text-foreground antialiased;
   }
   h1, h2, h3 {
     @apply font-heading tracking-tight text-ink;
+    text-wrap: balance;
   }
   :focus-visible {
     outline: 2px solid var(--color-brand-blue);
@@ -106,6 +126,20 @@
   /* Grid items may shrink below their content's min width (charts, long text) — no mobile overflow. */
   .grid > * {
     min-width: 0;
+  }
+}
+
+/* Expands the pointer/touch hit area to at least 44×44 without changing layout. */
+@utility tap-target {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
   }
 }
 

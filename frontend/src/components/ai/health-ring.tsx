@@ -42,7 +42,7 @@ export function HealthExplainer({ health, trigger }: { health: Health; trigger?:
     <Popover>
       <PopoverTrigger
         render={
-          <button type="button" className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-deep">
+          <button type="button" className="tap-target inline-flex items-center gap-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-deep">
             {trigger ?? (
               <>
                 <Info className="size-3.5" aria-hidden /> How is this calculated?
@@ -72,7 +72,7 @@ export function HealthExplainer({ health, trigger }: { health: Health; trigger?:
             </li>
           ))}
         </ul>
-        <p className="mt-3 rounded-lg bg-warn-soft px-2.5 py-2 text-[11px] text-warn">{health.disclaimer}</p>
+        <p className="mt-3 rounded-lg bg-warn-soft px-2.5 py-2 text-xs text-warn">{health.disclaimer}</p>
       </PopoverContent>
     </Popover>
   );

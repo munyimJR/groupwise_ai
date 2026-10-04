@@ -231,7 +231,7 @@ export default function HowItWorksPage() {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl bg-surface p-2.5">
-      <dt className="text-[11px] text-ink-muted">{label}</dt>
+      <dt className="text-xs text-ink-muted">{label}</dt>
       <dd className="tabular text-lg font-extrabold text-ink">{value}</dd>
     </div>
   );

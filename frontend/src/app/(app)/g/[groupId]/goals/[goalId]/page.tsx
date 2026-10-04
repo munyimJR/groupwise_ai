@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { fmtDate, fmtDateYear, likelihood, taka } from "@/lib/format";
 import { useGoal, useGroup, useInvalidateGroup } from "@/lib/queries";
-import { cn } from "@/lib/utils";
+import { cn, selectClass } from "@/lib/utils";
 
 export default function GoalDetailPage() {
   const { groupId, goalId } = useParams<{ groupId: string; goalId: string }>();
@@ -92,7 +92,7 @@ export default function GoalDetailPage() {
                     id="c-member"
                     value={member || group?.my_member_id || ""}
                     onChange={(e) => setMember(e.target.value)}
-                    className="h-10 w-full rounded-lg border border-input bg-white px-3 text-sm"
+                    className={selectClass}
                   >
                     {group?.members_detail
                       .filter((m) => m.status === "active")
@@ -149,7 +149,7 @@ export default function GoalDetailPage() {
                   <li key={s.key} className="rounded-xl border border-line p-3">
                     <p className="text-sm font-bold text-ink">{s.label}</p>
                     <p className="mt-0.5 text-sm text-ink">{s.text}</p>
-                    {s.assumption && <p className="mt-1 text-[11px] text-ink-muted">Assumption: {s.assumption}</p>}
+                    {s.assumption && <p className="mt-1 text-xs text-ink-muted">Assumption: {s.assumption}</p>}
                     {s.key === "reduce_dining" && (
                       <Link href={`/g/${groupId}/what-if?goal=${goalId}&cat=Food&pct=-${Math.min(40, Math.ceil((s.reduction_pct ?? 10) / 5) * 5)}`} className="mt-2 inline-block text-sm font-semibold text-brand-blue hover:underline">
                         Simulate it in What-If →
@@ -214,9 +214,9 @@ export default function GoalDetailPage() {
 function Metric({ label, value, sub, kind }: { label: string; value: string; sub: string; kind: "fact" | "prediction" }) {
   return (
     <div className="rounded-xl bg-surface p-3">
-      <p className="text-[11px] font-semibold text-ink-muted">{label}</p>
+      <p className="text-xs font-semibold text-ink-muted">{label}</p>
       <p className="tabular mt-0.5 text-xl font-extrabold text-ink">{value}</p>
-      <p className="text-[11px] text-ink-muted">{sub}</p>
+      <p className="text-xs text-ink-muted">{sub}</p>
       <ProvenanceBadge kind={kind} className="mt-1.5" withTooltip={false} />
     </div>
   );
