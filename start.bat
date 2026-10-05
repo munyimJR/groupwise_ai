@@ -41,7 +41,7 @@ timeout /t 5 >nul
 exit /b 0
 
 :need_python
-echo Python 3.11+ is required: https://www.python.org/downloads/  (tick "Add python.exe to PATH")
+echo Python 3.12+ is required: https://www.python.org/downloads/  (tick "Add python.exe to PATH")
 pause
 exit /b 1
 :need_node

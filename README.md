@@ -11,6 +11,18 @@ Track 03 — Customer Innovation & Financial Independence · AI Hackathon protot
 
 > GroupWise AI doesn't just tell groups where their money went. It helps them understand what is happening, anticipate what comes next, and make better financial decisions together.
 
+**Team (Daffodil International University, AI Hackathon 2026):** Muntasir Munyim Polash · Rony Roy · Syed Ahmad Galib
+
+### Quick start
+
+| | |
+|---|---|
+| **Windows, one click** | Double-click **`start.bat`** in the project folder. It starts the API and the web app in two windows and opens http://localhost:3000 (first run installs everything). |
+| **Any OS** | Follow [§13 Installation](#13-installation) and [§15 Run commands](#15-run-commands). |
+| **Try it** | Click **Explore the live demo** for a private sandbox with three synthetic groups, then follow [§18 Demo instructions](#18-demo-instructions). |
+
+No accounts or keys are needed to run it locally: by default it uses SQLite, built-in accounts and deterministic copilot answers. Supabase and Claude are optional ([§14](#14-environment-variables)).
+
 ---
 
 ## 1. Project overview
@@ -29,7 +41,7 @@ TRANSACTION DATA → FINANCIAL INTELLIGENCE → UNDERSTANDING → PREDICTION →
 
 ## 2. Problem statement
 
-> For students and young adults who regularly share expenses, fragmented group spending makes it difficult to track shared financial responsibility, understand spending behaviour, predict upcoming financial pressure, and make better financial decisions.
+> For students and young adults who regularly share expenses, fragmented group spending makes it difficult to track shared financial responsibility, understand spending behavior, predict upcoming financial pressure, and make better financial decisions.
 
 ## 3. Target users
 
@@ -66,10 +78,10 @@ GroupWise combines a **deterministic, exact ledger** with **purpose-built ML and
 | AI 3 · Unusual expense detection | Score + reasons (“8.2× the usual upper range for Restaurant…”), review: mark valid / dismiss / edit; never blocks | Isolation Forest + robust stats + rules |
 | AI 4 · Cash-flow forecast | Next 7/14/30 days with an 80% range, pressure days, drivers, recurring bills, per-member expected share, backtest accuracy | Time-series model |
 | AI 5 · Goal planner | Saved, projected, gap, required pace, simulated likelihood, scenarios that close the gap | Projection + Monte-Carlo |
-| AI 6 · Group dynamics | Paid vs consumed shares, high-value payer share, reimbursement delays, contribution balance index, payer rotation suggestion | Behavioural analytics (observable payments only) |
+| AI 6 · Group dynamics | Paid vs consumed shares, high-value payer share, reimbursement delays, contribution balance index, payer rotation suggestion | Behavioral analytics (observable payments only) |
 | **What If?** | Sliders per category, overall change, extra contributions → savings, pressure, per-member burden, goal impact | Simulation on the forecast |
 | **Ask GroupWise** | Grounded copilot with evidence chips, typed facts, numeric verification, graceful fallback | LLM explanation layer |
-| Financial health | Transparent weighted score with “How is this calculated?”, labelled *prototype indicator* | Formula |
+| Financial health | Transparent weighted score with “How is this calculated?”, labeled *prototype indicator* | Formula |
 | Notifications, PWA | Unusual expenses, goal/forecast alerts, activity; installable, offline page, never caches financial data | App |
 
 ## 7. AI/ML architecture
@@ -125,7 +137,7 @@ flowchart TD
 | Model | Test set | Result |
 |---|---|---|
 | Categorizer | 245 examples from **merchants and phrasings never seen in training** | Category accuracy **83.3%**, subcategory accuracy **80.4%** (macro F1 79.7%); **97.8%** accuracy on the 73% of cases where the model is confident, and the rest ask the user to confirm |
-| Anomaly detector | 40 unseen groups, 13,690 transactions, 231 labelled anomalies (tuned on separate validation seeds) | Precision **88.7%**, recall **95.2%**, F1 **91.9%**, false-positive rate **0.21%** |
+| Anomaly detector | 40 unseen groups, 13,690 transactions, 231 labeled anomalies (tuned on separate validation seeds) | Precision **88.7%**, recall **95.2%**, F1 **91.9%**, false-positive rate **0.21%** |
 | Forecast (7-day total) | Rolling-origin backtest, 20 test groups, 160 windows | MAE **৳2,902** vs ৳7,673 for a 28-day-average baseline (**62% lower**); RMSE ৳3,528 vs ৳9,235 |
 
 Regenerate with `python -m scripts.evaluate_models` (writes `backend/app/ml/evaluation.json`, served on the *How the AI works* page).
@@ -136,21 +148,21 @@ Regenerate with `python -m scripts.evaluate_models` (writes `backend/app/ml/eval
 |---|---|
 | Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui on Base UI, TanStack Query, Recharts, lucide icons |
 | Backend | Python 3.12+, FastAPI, SQLAlchemy 2, Pydantic v2 |
-| Data / ML | NumPy, scikit-learn (Pandas for evaluation reports) |
+| Data / ML | NumPy, scikit-learn (pandas only in the evaluation script) |
 | LLM | Anthropic Claude via the official Python SDK (optional) |
 | Database / Auth | Supabase PostgreSQL + Supabase Auth (JWKS/HS256 verification); SQLite + built-in auth for local dev |
 | Deployment | Vercel (web), Render or any Docker host (API), Supabase (DB/Auth) |
-| Quality | pytest (21 tests), ruff, ESLint, `tsc`, GitHub Actions CI |
+| Quality | pytest (22 tests), ruff, ESLint, `tsc`, GitHub Actions CI |
 
 ## 10. Synthetic data strategy
 
-No real customer data is used anywhere. Groups are **simulated from explicit behaviour**, not random noise. Full details are in [docs/SYNTHETIC_DATA.md](docs/SYNTHETIC_DATA.md).
+No real customer data is used anywhere. Groups are **simulated from explicit behavior**, not random noise. Full details are in [docs/SYNTHETIC_DATA.md](docs/SYNTHETIC_DATA.md).
 
 - **Normal patterns:** weekday lunches, snacks after class, evening rides, groceries, recurring rent and utilities, with log-normal amounts in realistic taka ranges.
 - **Time patterns:** Thursday-night and Friday/Saturday dinners (Bangladesh weekend), month-start "allowance" effect, late-night deliveries.
 - **Trends:** weekend restaurant spending rising over the last 30 days.
-- **Group behaviour:** one member fronts ~45% of costs; members settle on different cadences (1–2 days vs 7–11 days), producing real reimbursement delays.
-- **Anomalies (labelled):** amount spikes, a 3 AM delivery, a duplicate entry, a rare-category purchase, an electricity bill 3.4× normal.
+- **Group behavior:** one member fronts ~45% of costs; members settle on different cadences (1–2 days vs 7–11 days), producing real reimbursement delays.
+- **Anomalies (labeled):** amount spikes, a 3 AM delivery, a duplicate entry, a rare-category purchase, an electricity bill 3.4× normal.
 - **Goals:** a trip fund that is behind and an emergency fund that is on track.
 - Demo groups use low-variance sampling so the story holds on any day (verified by `scripts/check_demo_robustness.py`). **Evaluation uses separate seeds with full Poisson noise**, with validation and test seeds kept apart.
 - Every demo visitor gets a **private, expiring sandbox** (48 h) seeded through the same ML models as live data.
@@ -161,7 +173,7 @@ No real customer data is used anywhere. Groups are **simulated from explicit beh
 - **Explainability:** every insight shows observation → inference → evidence → method → confidence.
 - **Transparency:** UI badges distinguish *Observed fact*, *Model prediction*, *Assumption*, *AI explanation*, *Recommendation* and *Exact calculation*.
 - **Human oversight:** unusual expenses are flagged for review and never blocked. Recommendations can be marked helpful or dismissed, and dismissed ones are hidden for 7 days. Category corrections are respected and remembered.
-- **No judgments:** group dynamics analyse observable payments only, never personality, intent, reliability or financial status. Wording is neutral.
+- **No judgments:** group dynamics analyze observable payments only, never personality, intent, reliability or financial status. Wording is neutral.
 - **Honest uncertainty:** “projected”, “estimated”, “simulated likelihood” (shown as “<1%” or “>99%” rather than 0% or 100%), 80% ranges, and a *prototype* health indicator.
 - **AI security:** explicit handling of prompt-injection attempts and out-of-scope advice (investment, loans, tax). Expense text is sanitized and fenced as data. The numeric grounding check catches invented numbers. Rate limits apply to auth, demo and copilot. The LLM has no tools and no write access.
 - **Fallbacks:** if the LLM is down, auth, groups, expenses, balances, analytics and all ML features keep working, and the copilot answers deterministically with a notice.
@@ -169,35 +181,36 @@ No real customer data is used anywhere. Groups are **simulated from explicit beh
 ## 12. Architecture
 
 ```
-groupwise-ai/
+groupwise_ai/
 ├── backend/                 FastAPI service
 │   ├── app/core/            deterministic finance: money, splits, balances, debt simplification
 │   ├── app/ml/              categorizer, anomaly detector, forecast, taxonomy, text parsing
 │   ├── app/analytics/       spending, dynamics, goals, What-If, health, insights & recommendations
 │   ├── app/copilot/         intent detection + fact builders + grounded answer engine
 │   ├── app/llm/             Claude client (fallback-safe) + grounding check
-│   ├── app/synthetic/       behaviour-driven generator, scenarios, seeding
+│   ├── app/synthetic/       behavior-driven generator, scenarios, seeding
 │   ├── app/services/        snapshot cache, expense lifecycle, notifications
 │   ├── app/api/             routers (auth, groups, expenses, intelligence, notifications, meta)
-│   ├── scripts/             evaluate_models, check_demo_robustness, export_schema
-│   └── tests/               21 tests (finance invariants, API flows, ML, grounding)
+│   ├── scripts/             evaluate_models, check_demo_robustness, export_schema, set_database_url
+│   └── tests/               22 tests (finance invariants, API flows, ML, grounding)
 ├── frontend/                Next.js web app (mobile-first, PWA)
 │   └── src/app/             landing, auth, /groups, /g/[groupId]/{dashboard, add, transactions,
 │                            balances, insights, forecast, goals, what-if, ask, dynamics, members},
 │                            notifications, profile, join, how-it-works, offline
 ├── supabase/schema.sql      generated DDL + row-level security
-├── docs/                    architecture, synthetic data, model evaluation, demo script, deployment
-└── render.yaml              API deployment blueprint
+├── docs/                    architecture, synthetic data, model evaluation, demo script, deployment, design system
+├── render.yaml              API deployment blueprint
+└── start.bat                one-click local start on Windows (API + web app + browser)
 ```
 
 More detail is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## 13. Installation
 
-Prerequisites: **Python 3.12+**, **Node.js 20+**.
+Prerequisites: **Python 3.12+**, **Node.js 20+**. On Windows, `start.bat` does all of the steps below automatically on first run.
 
 ```bash
-git clone <your-repo-url> groupwise-ai && cd groupwise-ai
+git clone https://github.com/munyimJR/groupwise_ai.git && cd groupwise_ai
 
 # Backend
 cd backend
@@ -218,7 +231,7 @@ cp .env.example .env.local    # BACKEND_URL=http://127.0.0.1:8000
 
 | Variable | Purpose | Default |
 |---|---|---|
-| `DATABASE_URL` | SQLite locally or the Supabase pooled Postgres URL | `sqlite:///./groupwise.db` |
+| `DATABASE_URL` | SQLite locally, or the Supabase **pooler** Postgres URL (see below) | `sqlite:///./groupwise.db` |
 | `JWT_SECRET` | Signs locally issued tokens (required in production) | dev value |
 | `SUPABASE_URL` / `SUPABASE_JWT_SECRET` | Accept Supabase Auth tokens (JWKS, or legacy HS256 secret) | empty |
 | `ALLOW_LOCAL_AUTH` | Built-in email/password accounts | `true` |
@@ -229,7 +242,31 @@ cp .env.example .env.local    # BACKEND_URL=http://127.0.0.1:8000
 
 **Frontend (`frontend/.env.local`):** `BACKEND_URL`, plus optional `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (public publishable key only; legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` also works).
 
+`backend/.env` is read from the `backend/` folder no matter where the API is started from. Both env files are git-ignored.
+
+### Using Supabase (optional)
+
+Without Supabase the app runs on local SQLite with built-in accounts. To use Supabase Postgres and Supabase Auth:
+
+1. **Create a project** in the region closest to your users and your API host. For Bangladesh, choose **Southeast Asia (Singapore)**, which is also a Render region. Every query crosses the network, so distance matters: Singapore is about 80 ms from Dhaka, Sydney about 340 ms.
+2. **Auth keys:** copy the **Project URL** and the **publishable key** (`sb_publishable_…`).
+   - `frontend/.env.local`: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `backend/.env`: `SUPABASE_URL` (tokens are verified with the project's JWKS; no secret needed)
+3. **Database URL:** in Supabase click **Connect** and copy the **Session pooler** URI (port 5432) or Transaction pooler (port 6543). Do not use the *Direct connection* (`db.<ref>.supabase.co`): it is IPv6-only and fails on many networks. Save it with the helper, which asks for the password without showing it, percent-encodes it, tests the connection and only then writes `DATABASE_URL` to `backend/.env`:
+   ```bash
+   backend/.venv/Scripts/python.exe backend/scripts/set_database_url.py "postgresql://postgres.<project-ref>:[YOUR-PASSWORD]@aws-0-<region>.pooler.supabase.com:5432/postgres"
+   ```
+   (macOS/Linux: `backend/.venv/bin/python`.) You can also paste the URI into `backend/.env` by hand, replacing `[YOUR-PASSWORD]`, brackets included.
+4. **Optional, for a frictionless demo:** Authentication → Sign In / Providers → Email → turn off *Confirm email*.
+5. **Restart the API.** It creates all 12 tables with row-level security enabled (or run `supabase/schema.sql` in the SQL Editor first). `http://localhost:8000/api/health` should show `"database": true`, and the tables appear in the Table Editor.
+
+Never put the **service_role** key in either app. Deployment settings for Render and Vercel are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## 15. Run commands
+
+**Option A: one click (Windows).** Double-click `start.bat`. It opens two windows, *GroupWise API - port 8000* and *GroupWise Web - port 3000*, and opens the browser when the app is ready. Close the two windows to stop. On first run it creates `backend/.venv`, installs the Python and Node packages, and copies `backend/.env.example` to `backend/.env` if it is missing.
+
+**Option B: two terminals (any OS).** Activate the backend virtual environment first (see §13).
 
 ```bash
 # Terminal 1 — API on http://127.0.0.1:8000 (docs at /api/docs)
@@ -239,14 +276,14 @@ cd backend && uvicorn app.main:app --reload --port 8000
 cd frontend && npm run dev
 ```
 
-Open http://localhost:3000 and click **Explore the live demo**.
+Open http://localhost:3000 and click **Explore the live demo**. The web app proxies `/api` to `BACKEND_URL`, so only port 3000 is needed in the browser.
 
 ## 16. Testing
 
 ```bash
 cd backend
-pytest                                   # 21 tests: finance invariants, randomized debt simplification,
-                                         # end-to-end API flows, ML behaviour, grounding check, intents
+pytest                                   # 22 tests: finance invariants, randomized debt simplification,
+                                         # end-to-end API flows, ML behavior, grounding check, intents
 ruff check app scripts tests
 python -m scripts.evaluate_models        # model metrics on held-out synthetic data
 python -m scripts.check_demo_robustness  # demo narrative across 28 different "today" dates
@@ -272,20 +309,21 @@ CI runs all of the above on every push (`.github/workflows/ci.yml`).
 
 - All models are validated on **synthetic data only**. Real-world performance needs validation on governed, anonymized data.
 - The forecast cannot anticipate genuine one-off events. For small or irregular groups the range is wide, and the app shows it.
-- The categorizer covers 34 Bangladesh-flavoured subcategories. Unfamiliar merchants rely on context words, and the app asks for confirmation when unsure.
+- The categorizer covers 34 Bangladesh-flavored subcategories. Unfamiliar merchants rely on context words, and the app asks for confirmation when unsure.
 - The demo sandbox is per-visitor and expires after 48 h. On free hosting the API may take up to a minute to wake.
 - No real payments move: settlements are recorded, not executed. Percentage and exact splits exist in the engine and API but the MVP UI uses equal splits.
 - Built-in rate limiting is in-memory (per instance).
+- With a remote database, response time depends on the distance between the API and the database. Host both in the same region (for example Supabase Singapore + Render Singapore). Creating a demo sandbox writes about 2,000 expenses in batched inserts.
 
 ## 20. Future integration path
 
 ```
 Synthetic data  →  Prototype validation with student groups  →  Controlled validation on governed,
-anonymised or aggregated data  →  Potential integration with an MFS backend
+anonymized or aggregated data  →  Potential integration with an MFS backend
 ```
 
-Potential MFS value: deeper everyday utility for shared money, engagement around goals, personalised but explainable insights, and new financial-intelligence products, delivered with the same rule that **AI recommends and people decide**.
+Potential MFS value: deeper everyday utility for shared money, engagement around goals, personalized but explainable insights, and new financial-intelligence products, delivered with the same rule that **AI recommends and people decide**.
 
 ---
 
-<sub>GroupWise AI is an independent hackathon prototype. It is not affiliated with or endorsed by upay or any financial institution, it uses an upay-*inspired* colour direction only, it uses synthetic data, and it makes no claims about business results. Not financial advice.</sub>
+<sub>GroupWise AI is an independent hackathon prototype. It is not affiliated with or endorsed by upay or any financial institution, it uses an upay-*inspired* color direction only, it uses synthetic data, and it makes no claims about business results. Not financial advice.</sub>
