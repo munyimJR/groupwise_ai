@@ -21,8 +21,9 @@ from ..copilot.engine import ask
 from ..core.money import MoneyError, to_paisa
 from ..db import get_db
 from ..llm.client import llm_status
-from ..models import AIOutput, Expense, Goal, GoalContribution, GroupMember, RecommendationAction
+from ..models import AIOutput, Expense, Goal, GoalContribution, Group, GroupMember, RecommendationAction
 from ..schemas import ContributionIn, CopilotIn, GoalIn, GoalUpdateIn, RecommendationActionIn, WhatIfIn
+from ..services.experiments import arm_of
 from ..services.notifications import notify_members, notify_user
 from ..services.snapshot import GroupSnapshot, load_snapshot
 from .common import GroupAccess, expense_out, group_access, member_names
@@ -63,15 +64,18 @@ def _sync_insight_notifications(db: Session, access: GroupAccess, insights: list
 def dashboard(access: GroupAccess = Depends(group_access), db: Session = Depends(get_db)) -> dict:
     snap = _snap(db, access)
     me = access.member.id
+    arm = arm_of(db, access.group.id)
     bal = balances(snap)
     mine = next((m for m in bal["members"] if m["member_id"] == me), None)
     spend = spending_report(snap, 30)
-    insights = build_insights(snap, me)
-    recs = build_recommendations(snap, _dismissed(db, access), me)
+    # Control arm of the pilot experiment: same ledger, no AI insights, recommendations or nudges.
+    insights = build_insights(snap, me) if arm == "treatment" else []
+    recs = build_recommendations(snap, _dismissed(db, access), me) if arm == "treatment" else []
     fc = group_forecast(snap, 7)
     goals = [plan_goal(snap, g) for g in snap.goals if g.status == "active"]
     dyn = dynamics_report(snap, me)
-    _sync_insight_notifications(db, access, insights)
+    if arm == "treatment":
+        _sync_insight_notifications(db, access, insights)
     recent = db.scalars(select(Expense).options(selectinload(Expense.splits))
                         .where(Expense.group_id == access.group.id, Expense.is_deleted.is_(False))
                         .order_by(Expense.occurred_at.desc()).limit(6)).all()
@@ -96,6 +100,7 @@ def dashboard(access: GroupAccess = Depends(group_access), db: Session = Depends
                      "naive_transfer_count": bal["naive_transfer_count"]},
         "recent_expenses": [expense_out(e, names) for e in recent],
         "llm": llm_status(),
+        "experiment_arm": arm,
         "as_of": snap.as_of.isoformat(),
     }
 
@@ -186,7 +191,7 @@ def create_goal(body: GoalIn, access: GroupAccess = Depends(group_access), db: S
     g = Goal(group_id=access.group.id, title=body.title.strip(), description=body.description, target_paisa=target,
              start_date=start, deadline=body.deadline, created_by_user_id=access.user.id)
     db.add(g)
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     notify_members(db, access.group, exclude_user_id=access.user.id, kind="goal", title=f"New goal in {access.group.name}",
                    body=f"{access.member.display_name} created “{g.title}” — target ৳{target / 100:,.0f}.",
                    link=f"/g/{access.group.id}/goals")
@@ -224,7 +229,7 @@ def update_goal(goal_id: str, body: GoalUpdateIn, access: GroupAccess = Depends(
         g.deadline = body.deadline
     if body.status is not None:
         g.status = body.status
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return get_goal(goal_id, access, db)
 
@@ -233,7 +238,7 @@ def update_goal(goal_id: str, body: GoalUpdateIn, access: GroupAccess = Depends(
 def delete_goal(goal_id: str, access: GroupAccess = Depends(group_access), db: Session = Depends(get_db)) -> dict:
     g = _goal(db, access, goal_id)
     g.status = "archived"
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return {"ok": True}
 
@@ -251,7 +256,7 @@ def add_contribution(goal_id: str, body: ContributionIn, access: GroupAccess = D
     when = body.occurred_at.replace(tzinfo=None) if body.occurred_at else local_now()
     db.add(GoalContribution(goal_id=goal_id, member_id=body.member_id, amount_paisa=amount, occurred_at=when,
                             note=body.note))
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return get_goal(goal_id, access, db)
 

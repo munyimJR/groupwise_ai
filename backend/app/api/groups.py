@@ -13,6 +13,7 @@ from ..config import get_settings, utc_now
 from ..db import get_db
 from ..models import Group, GroupMember, User, new_invite_code
 from ..schemas import GroupCreateIn, GroupUpdateIn, JoinIn, MemberAddIn
+from ..services.experiments import arm_of, assign_arm
 from ..services.notifications import notify_members
 from ..services.snapshot import load_snapshot
 from ..synthetic.generator import COLORS
@@ -36,6 +37,7 @@ def _group_summary(db: Session, group: Group, me: GroupMember) -> dict:
         "flagged_count": sum(1 for e in snap.expenses if e.anomaly_status == "flagged"),
         "last_activity": last.isoformat() if last else None,
         "members": [{"id": m.id, "name": m.name, "color": m.color} for m in snap.active_members[:6]],
+        "experiment_arm": arm_of(db, group.id),
     }
 
 
@@ -57,6 +59,7 @@ def create_group(body: GroupCreateIn, user: User = Depends(get_current_user), db
     db.add(owner)
     for i, name in enumerate(body.member_names):
         db.add(GroupMember(group_id=group.id, display_name=name, role="guest", avatar_color=COLORS[(i + 1) % len(COLORS)]))
+    assign_arm(db, group, user)  # only while a controlled pilot experiment is running
     db.commit()
     return _group_summary(db, group, owner)
 
@@ -86,7 +89,7 @@ def update_group(body: GroupUpdateIn, access: GroupAccess = Depends(group_access
         g.group_type = body.group_type
     if body.monthly_budget is not None:
         g.monthly_budget_paisa = int(round(body.monthly_budget * 100)) or None
-    g.data_version += 1
+    g.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return get_group(access, db)
 
@@ -99,7 +102,7 @@ def add_member(body: MemberAddIn, access: GroupAccess = Depends(group_access), d
     m = GroupMember(group_id=access.group.id, display_name=body.display_name.strip(), role="guest",
                     avatar_color=COLORS[count % len(COLORS)])
     db.add(m)
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return member_out(m, access.member.id)
 
@@ -118,7 +121,7 @@ def leave_group(access: GroupAccess = Depends(group_access), db: Session = Depen
                                                         GroupMember.user_id.is_not(None), GroupMember.id != access.member.id))
         if successor:
             successor.role = "owner"
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return {"ok": True}
 
@@ -163,7 +166,7 @@ def join_group(code: str, body: JoinIn, user: User = Depends(get_current_user), 
         member = GroupMember(group_id=g.id, user_id=user.id, display_name=user.display_name, role="member",
                              avatar_color=COLORS[count % len(COLORS)])
         db.add(member)
-    g.data_version += 1
+    g.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.flush()
     notify_members(db, g, exclude_user_id=user.id, kind="member", title=f"New member in {g.name}",
                    body=f"{member.display_name} joined the group.", link=f"/g/{g.id}/members")

@@ -17,6 +17,24 @@ interface ModelsResponse {
     anomaly: { validation: Record<string, number>; test: { precision: number; recall: number; f1: number; false_positive_rate: number; groups: number; transactions: number; injected_anomalies: number; recall_by_kind: Record<string, number> } };
     forecast: { groups: number; windows: number; mae_7day: number; rmse_7day: number; baseline_mean28: { mae_7day: number; rmse_7day: number }; baseline_lastweek: { mae_7day: number }; mae_improvement_vs_mean28_pct: number; weekly_mape: number; bias_pct: number };
   } | null;
+  validation: {
+    generated_at: string;
+    categorizer: {
+      comparison: Record<string, { sub_accuracy: number; sub_accuracy_ci: [number, number] }>;
+      calibration: { ece: number };
+      calibration_temperature_scaled?: { ece: number; temperature: number };
+      stress_set?: { n: number; groupwise: { sub_accuracy: number }; keyword_rules: { sub_accuracy: number } };
+    };
+    anomaly: {
+      comparison: Record<string, { f1: number; f1_ci: [number, number] }>;
+      prospective?: { online_past_only: { f1: number }; batch_same_transactions: { f1: number } };
+    };
+    forecast: {
+      comparison: Record<string, { mae_7day: number; mae_ci: [number, number] }>;
+      interval_80?: { coverage: number; coverage_before_tuning?: number };
+      leakage?: { future_data_changes_forecast: boolean };
+    };
+  } | null;
   models: { key: string; name: string; type: string; version: string; method: string; inputs: string; outputs: string; limitations: string }[];
   deterministic: { name: string; method: string }[];
 }
@@ -190,6 +208,8 @@ export default function HowItWorksPage() {
           {ev && <p className="mt-3 text-xs text-ink-muted">Generated {ev.generated_at}. Thresholds were tuned on validation seeds and reported on separate test seeds.</p>}
         </section>
 
+        {data?.validation && <Validation v={data.validation} />}
+
         <section aria-labelledby="ra" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <h2 id="ra" className="col-span-full text-xl font-extrabold text-ink">Responsible AI safeguards</h2>
           {[
@@ -236,3 +256,82 @@ function Metric({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+function Comparison({ title, rows, fmt }: { title: string; rows: [string, number, [number, number]][]; fmt: (v: number) => string }) {
+  const best = rows.length - 1;
+  return (
+    <div className="card-surface p-5">
+      <p className="font-bold text-ink">{title}</p>
+      <table className="mt-3 w-full text-sm">
+        <tbody>
+          {rows.map(([name, v, ci], i) => (
+            <tr key={name} className={i === best ? "font-bold text-ink" : "text-ink-muted"}>
+              <td className="py-1 pr-3">{name}</td>
+              <td className="tabular py-1 text-right">
+                {fmt(v)}
+                <span className="block text-xs font-normal text-ink-muted">
+                  {fmt(ci[0])}–{fmt(ci[1])}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Validation({ v }: { v: NonNullable<ModelsResponse["validation"]> }) {
+  const pick = <T,>(o: Record<string, T>, keys: string[]) => keys.filter((k) => k in o).map((k) => [k, o[k]] as const);
+  const cat = Object.entries(v.categorizer.comparison);
+  const catRows = ["Keyword", "Naive", "GroupWise as deployed"]
+    .map((prefix) => cat.find(([k]) => k.startsWith(prefix)))
+    .filter((r): r is (typeof cat)[number] => !!r)
+    .map(([k, s]) => [k, s.sub_accuracy, s.sub_accuracy_ci] as [string, number, [number, number]]);
+  const anRows = pick(v.anomaly.comparison, ["Rule: amount > 3x the group's median for that subcategory", "Isolation Forest only", "Hybrid without Isolation Forest", "GroupWise hybrid (all signals)"]).map(
+    ([k, s]) => [k, s.f1, s.f1_ci] as [string, number, [number, number]],
+  );
+  const fcRows = pick(v.forecast.comparison, ["Mean of previous 28 days", "Same weekday, 4-week average", "GroupWise without recurring bills", "GroupWise forecast"]).map(
+    ([k, s]) => [k, s.mae_7day, s.mae_ci] as [string, number, [number, number]],
+  );
+  return (
+    <section aria-labelledby="val">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <h2 id="val" className="text-xl font-extrabold text-ink">Does each model beat simple rules?</h2>
+        <span className="rounded-full bg-warn-soft px-3 py-1 text-xs font-bold text-warn">Synthetic test data · 95% confidence intervals</span>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <Comparison title="Categorization: subcategory accuracy" rows={catRows} fmt={(x) => pct(x)} />
+        <Comparison title="Unusual expenses: F1" rows={anRows} fmt={(x) => pct(x)} />
+        <Comparison title="Forecast: 7-day error (MAE, lower is better)" rows={fcRows} fmt={(x) => `৳${Math.round(x).toLocaleString()}`} />
+      </div>
+      <ul className="mt-4 grid gap-2 text-sm text-ink md:grid-cols-2">
+        {v.categorizer.stress_set && (
+          <li className="card-surface p-3">
+            <strong>Hand-written test:</strong> {pct(v.categorizer.stress_set.groupwise.sub_accuracy)} on {v.categorizer.stress_set.n} descriptions the data generator never
+            produced (keyword rules: {pct(v.categorizer.stress_set.keyword_rules.sub_accuracy)}).
+          </li>
+        )}
+        <li className="card-surface p-3">
+          <strong>Calibration:</strong> categorizer calibration error {v.categorizer.calibration.ece.toFixed(3)}
+          {v.categorizer.calibration_temperature_scaled && `, ${v.categorizer.calibration_temperature_scaled.ece.toFixed(3)} after temperature scaling`}.
+          {v.forecast.interval_80 && ` Forecast 80% range covers ${pct(v.forecast.interval_80.coverage, 0)} of outcomes`}
+          {v.forecast.interval_80?.coverage_before_tuning !== undefined && ` (was ${pct(v.forecast.interval_80.coverage_before_tuning, 0)} before tuning)`}.
+        </li>
+        {v.anomaly.prospective && (
+          <li className="card-surface p-3">
+            <strong>No look-ahead:</strong> scoring each expense with past data only gives F1 {pct(v.anomaly.prospective.online_past_only.f1)} (batch:{" "}
+            {pct(v.anomaly.prospective.batch_same_transactions.f1)}).
+            {v.forecast.leakage && !v.forecast.leakage.future_data_changes_forecast && " Forecasts don't change when future data is supplied."}
+          </li>
+        )}
+        <li className="card-surface p-3">
+          <strong>What is learned:</strong> two trained models (categorizer, Isolation Forest) and one fitted statistical forecaster. Goal likelihood is a
+          simulation; drivers and dynamics are analytics. Real-user accuracy is measured in the pilot.
+        </li>
+      </ul>
+      <p className="mt-3 text-xs text-ink-muted">Generated {v.generated_at}. Full method: docs/MODEL_VALIDATION.md.</p>
+    </section>
+  );
+}
+

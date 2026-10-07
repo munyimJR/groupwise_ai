@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, Loader2, Scale, Shuffle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2, Scale, Shuffle, Wallet } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { WalletPayDialog } from "@/components/wallet/wallet-pay-dialog";
 import { api } from "@/lib/api";
 import { fmtDate, taka } from "@/lib/format";
 import { useBalances, useInvalidateGroup, useSettlements } from "@/lib/queries";
@@ -27,6 +28,7 @@ export default function BalancesPage() {
   const [pending, setPending] = useState<Transfer | null>(null);
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
+  const [walletPay, setWalletPay] = useState<Transfer | null>(null);
 
   async function record() {
     if (!pending) return;
@@ -108,15 +110,25 @@ export default function BalancesPage() {
                         <strong className="truncate text-ink">{t.to_member_id === data.my_member_id ? "you" : t.to_name}</strong>
                       </span>
                       <span className="tabular font-extrabold text-ink">{taka(t.amount, { decimals: true })}</span>
+                      {t.from_member_id === data.my_member_id && (
+                        <Button size="sm" variant="blue" onClick={() => setWalletPay(t)}>
+                          <Wallet className="size-3.5" aria-hidden /> Pay via wallet
+                        </Button>
+                      )}
+                      {t.to_member_id === data.my_member_id && (
+                        <Button size="sm" variant="blue" onClick={() => setWalletPay(t)}>
+                          <Wallet className="size-3.5" aria-hidden /> Request via wallet
+                        </Button>
+                      )}
                       <Button
                         size="sm"
-                        variant={t.involves_you ? "blue" : "outline"}
+                        variant="outline"
                         onClick={() => {
                           setPending(t);
                           setAmount((t.amount / 100).toFixed(2));
                         }}
                       >
-                        Record payment
+                        {t.involves_you ? "Record" : "Record payment"}
                       </Button>
                     </li>
                   ))}
@@ -145,6 +157,22 @@ export default function BalancesPage() {
           </Card>
         </div>
       </div>
+
+      {walletPay && (
+        <WalletPayDialog
+          key={`${walletPay.to_member_id}-${walletPay.amount}`}
+          groupId={groupId}
+          open={!!walletPay}
+          onOpenChange={(o) => !o && setWalletPay(null)}
+          purpose="settlement"
+          payeeMemberId={walletPay.to_member_id}
+          payeeName={walletPay.to_name}
+          payerMemberId={walletPay.from_member_id === data.my_member_id ? undefined : walletPay.from_member_id}
+          payerName={walletPay.from_name}
+          defaultAmount={walletPay.amount}
+          returnTo={`/g/${groupId}/balances`}
+        />
+      )}
 
       <Dialog open={!!pending} onOpenChange={(o) => !o && setPending(null)}>
         <DialogContent className="sm:max-w-sm">

@@ -21,6 +21,10 @@ class LoginIn(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
+class DeleteAccountIn(BaseModel):
+    confirm: str = Field(max_length=10)
+
+
 class ProfileUpdateIn(BaseModel):
     display_name: str = Field(min_length=1, max_length=80)
 
@@ -147,3 +151,33 @@ class CopilotIn(BaseModel):
 
 class RecommendationActionIn(BaseModel):
     action: Literal["accepted", "dismissed"]
+
+
+# ----------------------------------------------------------------------------- mobile wallet (MFS)
+class StatementIn(BaseModel):
+    csv: str = Field(min_length=1, max_length=300_000)
+
+
+class ImportSelection(BaseModel):
+    txn_id: str = Field(min_length=1, max_length=64)
+    action: Literal["expense", "settlement"]
+    subcategory: str | None = Field(default=None, max_length=60)
+    to_member_id: str | None = Field(default=None, max_length=36)
+    description: str | None = Field(default=None, max_length=200)
+
+
+class StatementImportIn(StatementIn):
+    selections: list[ImportSelection] = Field(min_length=1, max_length=200)
+    participant_ids: list[str] = Field(min_length=1, max_length=50)
+
+
+class PaymentRequestIn(BaseModel):
+    purpose: Literal["settlement", "goal_contribution"]
+    amount: float = Field(gt=0, le=100_000_000)
+    payee_member_id: str | None = Field(default=None, max_length=36)
+    goal_id: str | None = Field(default=None, max_length=36)
+    payer_member_id: str | None = Field(default=None, max_length=36)  # set to request money from someone
+
+
+class SandboxActionIn(BaseModel):
+    action: Literal["approve", "decline"]

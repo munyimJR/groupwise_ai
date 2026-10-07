@@ -20,6 +20,7 @@ import {
   UserPlus,
   Users,
   type LucideIcon,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -73,7 +74,23 @@ interface NavItem {
   badge?: string;
 }
 
-function groupNav(id: string): { title: string; items: NavItem[] }[] {
+/** `control` = pilot experiment control arm: the ledger and goals without the AI layer. */
+function groupNav(id: string, control = false): { title: string; items: NavItem[] }[] {
+  if (control) {
+    return [
+      {
+        title: "Money",
+        items: [
+          { href: `/g/${id}`, label: "Dashboard", icon: LayoutDashboard, exact: true },
+          { href: `/g/${id}/transactions`, label: "Transactions", icon: Receipt },
+          { href: `/g/${id}/balances`, label: "Balances & settle up", icon: Scale },
+          { href: `/g/${id}/import`, label: "Import from wallet", icon: Wallet },
+          { href: `/g/${id}/goals`, label: "Goals", icon: Target },
+        ],
+      },
+      { title: "Group", items: [{ href: `/g/${id}/members`, label: "Members & invite", icon: UserPlus }] },
+    ];
+  }
   return [
     {
       title: "Money",
@@ -81,6 +98,7 @@ function groupNav(id: string): { title: string; items: NavItem[] }[] {
         { href: `/g/${id}`, label: "Dashboard", icon: LayoutDashboard, exact: true },
         { href: `/g/${id}/transactions`, label: "Transactions", icon: Receipt },
         { href: `/g/${id}/balances`, label: "Balances & settle up", icon: Scale },
+        { href: `/g/${id}/import`, label: "Import from wallet", icon: Wallet },
       ],
     },
     {
@@ -197,9 +215,15 @@ function UserMenu() {
   );
 }
 
+function useControlArm(groupId: string | null): boolean {
+  const { data: groups } = useGroups(!!groupId);
+  return groups?.find((g) => g.id === groupId)?.experiment_arm === "control";
+}
+
 function Sidebar({ groupId }: { groupId: string | null }) {
   const pathname = usePathname();
-  const sections = groupId ? groupNav(groupId) : [];
+  const control = useControlArm(groupId);
+  const sections = groupId ? groupNav(groupId, control) : [];
   const globalItems: NavItem[] = [
     { href: "/groups", label: "All groups", icon: Users, exact: true },
     { href: "/notifications", label: "Notifications", icon: Bell },
@@ -267,13 +291,16 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
 
 function BottomNav({ groupId }: { groupId: string | null }) {
   const pathname = usePathname();
+  const control = useControlArm(groupId);
   const items: (NavItem & { primary?: boolean })[] = groupId
     ? [
         { href: `/g/${groupId}`, label: "Home", icon: Home, exact: true },
         { href: `/g/${groupId}/transactions`, label: "Activity", icon: Receipt },
         { href: `/g/${groupId}/add`, label: "Add", icon: Plus, primary: true },
-        { href: `/g/${groupId}/balances`, label: "Balances", icon: Scale },
-        { href: `/g/${groupId}/insights`, label: "More", icon: MoreHorizontal },
+        control
+          ? { href: `/g/${groupId}/balances`, label: "Settle up", icon: Scale }
+          : { href: `/g/${groupId}/insights`, label: "Insights", icon: Lightbulb },
+        { href: `/g/${groupId}/goals`, label: "Goals", icon: Target },
       ]
     : [
         { href: "/groups", label: "Groups", icon: Users, exact: true },

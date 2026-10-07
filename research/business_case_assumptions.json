@@ -1,0 +1,21 @@
+{
+  "_note": "Scenario inputs for research/business_case.py. 'fact' values are cited; every 'assumption' is a guess to be replaced by the measurement named in 'replaced_by' once the survey and pilot run.",
+  "facts": {
+    "students": {"value": 4821165, "source": "UGC annual report (2023 data), public universities and affiliated colleges — Prothom Alo, 4 Oct 2025"}
+  },
+  "assumptions": {
+    "adoption_share": {"label": "Students using GroupWise inside the wallet", "conservative": 0.005, "base": 0.02, "optimistic": 0.05, "replaced_by": "Partner rollout data; survey Q13 (likely to use it inside a wallet) as an early signal"},
+    "groups_per_user": {"label": "Groups each user is in", "conservative": 1.2, "base": 1.5, "optimistic": 2.0, "replaced_by": "Survey Q3 (types of groups)"},
+    "group_size": {"label": "Members per group", "conservative": 5, "base": 5, "optimistic": 5, "replaced_by": "Pilot: members per group"},
+    "expenses_per_group_month": {"label": "Shared expenses per group per month", "conservative": 15, "base": 25, "optimistic": 40, "replaced_by": "Pilot: expenses per group per week × 4.3"},
+    "avg_expense_taka": {"label": "Average shared expense (৳)", "conservative": 500, "base": 650, "optimistic": 800, "replaced_by": "Pilot: average expense amount"},
+    "settlements_per_user_month": {"label": "Pay-backs per user per month", "conservative": 2, "base": 3, "optimistic": 4, "replaced_by": "Pilot: settlements per member per month"},
+    "avg_settlement_taka": {"label": "Average pay-back (৳)", "conservative": 500, "base": 700, "optimistic": 900, "replaced_by": "Pilot: average settlement amount"},
+    "wallet_settle_share": {"label": "Pay-backs done through the wallet flow", "conservative": 0.5, "base": 0.7, "optimistic": 0.85, "replaced_by": "Experiment: wallet-flow share of settlements"},
+    "goal_group_share": {"label": "Groups with a funded shared goal", "conservative": 0.2, "base": 0.35, "optimistic": 0.5, "replaced_by": "Pilot: groups with goal contributions"},
+    "avg_goal_taka": {"label": "Average goal target (৳)", "conservative": 15000, "base": 25000, "optimistic": 40000, "replaced_by": "Pilot: goal targets"},
+    "goal_balance_fraction": {"label": "Average share of the target held in the goal pocket", "conservative": 0.3, "base": 0.4, "optimistic": 0.5, "replaced_by": "Pilot: saved ÷ target over time"},
+    "non_customer_members": {"label": "Group members who don't use this wallet yet", "conservative": 0.6, "base": 0.7, "optimistic": 0.8, "replaced_by": "Survey Q14 (main wallet)"},
+    "invite_conversion": {"label": "Of those, members who open the wallet to settle or save", "conservative": 0.03, "base": 0.07, "optimistic": 0.12, "replaced_by": "Partner A/B test of invite-to-pay links"}
+  }
+}

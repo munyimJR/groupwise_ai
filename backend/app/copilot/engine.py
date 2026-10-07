@@ -24,6 +24,7 @@ from ..analytics.spending import spending_report
 from ..core.money import fmt_taka
 from ..llm import grounding
 from ..llm.client import LLMUnavailable, generate, llm_status
+from ..ml.taxonomy import CATEGORIES
 from ..services.snapshot import GroupSnapshot
 from .intents import classify
 
@@ -68,8 +69,8 @@ def _spending(snap: GroupSnapshot, fs: FactSet) -> tuple[str, list[str]]:
         f_un = fs.add("fact", f"{len(rep['unusual_in_period'])} unusual expense(s) fall in this period, the largest "
                               f"{fmt_taka(big['amount'])} (“{_clean(big['description'])}”). Excluding them, spending changed "
                               f"{_pct(rep['change_pct_excluding_unusual'])}.", "anomaly model + expenses table")
-        parts.append(f"Part of that is one-off: the unusual {fmt_taka(big['amount'])} expense. Without unusual expenses the "
-                     f"change is {_pct(rep['change_pct_excluding_unusual'])} [{f_un}].")
+        parts.append(f"Part of that is one-off: the unusual {fmt_taka(big['amount'])} expense [{f_un}]. Without unusual "
+                     f"expenses the change is {_pct(rep['change_pct_excluding_unusual'])} [{f_un}].")
     focus = rep.get("focus")
     if focus:
         f_cat = fs.add("fact", f"{focus['category']} (recurring behaviour, one-offs excluded): {fmt_taka(focus['current'])} vs "
@@ -77,13 +78,17 @@ def _spending(snap: GroupSnapshot, fs: FactSet) -> tuple[str, list[str]]:
         parts.append(f"The biggest shift is {focus['category']}: {fmt_taka(focus['current'])} vs {fmt_taka(focus['previous'])} "
                      f"({_pct(focus['change_pct'])}) [{f_cat}].")
         for d in rep["drivers"][:2]:
-            how = (f"{d['count_previous']} → {d['count_current']} expenses (more frequent)" if d["mainly"] == "frequency"
-                   else f"average bill {fmt_taka(d['avg_previous'])} → {fmt_taka(d['avg_current'])} (bigger bills)")
-            f_d = fs.add("fact", f"{d['segment']} expenses account for {d['share_of_change_pct']:.0f}% of the {focus['category']} "
+            if d["mainly"] == "frequency":
+                how = (f"{d['count_previous']} → {d['count_current']} expenses "
+                       f"({'more' if d['count_current'] > d['count_previous'] else 'less'} frequent)")
+            else:
+                how = (f"average bill {fmt_taka(d['avg_previous'])} → {fmt_taka(d['avg_current'])} "
+                       f"({'bigger' if d['avg_current'] > d['avg_previous'] else 'smaller'} bills)")
+            share = min(d["share_of_change_pct"], 100)  # other segments can offset, so a raw share may exceed 100%
+            f_d = fs.add("fact", f"{d['segment']} expenses account for {share:.0f}% of the {focus['category']} "
                                  f"change: {fmt_taka(d['previous'])} → {fmt_taka(d['current'])}; {how}.", src)
             if d is rep["drivers"][0]:
-                parts.append(f"{d['segment']} expenses account for about {min(d['share_of_change_pct'], 100):.0f}% of it — "
-                             f"{how} [{f_d}].")
+                parts.append(f"{d['segment']} expenses account for about {share:.0f}% of it — {how} [{f_d}].")
     return " ".join(parts), ["Which category increased the most?", "What can we change to reach our goal?"]
 
 
@@ -320,11 +325,12 @@ def ask(snap: GroupSnapshot, question: str, me_member_id: str | None = None, his
         "health": lambda: _health(snap, fs),
     }
     template_answer, follow_ups = builders.get(name, lambda: _overview(snap, fs, me_member_id))()
-    fact_texts = [f["statement"] for f in fs.facts]
+    # Names the answer could mention: anything outside the facts is an invented subject.
+    vocabulary = [m.name for m in snap.members] + [g.title for g in snap.goals] + list(CATEGORIES)
 
     status = llm_status()
     mode, notice, answer = "template", None, template_answer
-    grounding_result = grounding.check(template_answer, fact_texts, question)
+    grounding_result = grounding.check(template_answer, fs.facts, question, vocabulary)
     if status["available"]:
         convo = ""
         for turn in (history or [])[-4:]:
@@ -336,14 +342,16 @@ def ask(snap: GroupSnapshot, question: str, me_member_id: str | None = None, his
                     + f"<question>{question}</question>")
         try:
             llm_answer = generate(SYSTEM_PROMPT, user_msg, max_tokens=900)
-            check = grounding.check(llm_answer, fact_texts, question)
+            check = grounding.check(llm_answer, fs.facts, question, vocabulary)
             if check["passed"]:
                 mode, answer, grounding_result = "llm", llm_answer, check
             else:
-                notice = ("The language model's answer included figures that couldn't be verified against your data, so "
-                          "GroupWise is showing its verified answer instead.")
-                grounding_result = {**grounding.check(template_answer, fact_texts, question),
-                                    "rejected_llm_numbers": check["unverified"]}
+                notice = ("The language model's answer included statements that couldn't be verified against your data, "
+                          "so GroupWise is showing its verified answer instead.")
+                grounding_result = {**grounding.check(template_answer, fs.facts, question, vocabulary),
+                                    "rejected_llm_numbers": check["unverified"],
+                                    "rejected_llm_issues": {k: check[k] for k in ("unknown_citations", "unsupported_entities",
+                                                                                  "contradictions") if check[k]}}
         except LLMUnavailable:
             notice = "AI Copilot language model is temporarily unavailable. Your core financial features are still working."
     else:

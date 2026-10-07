@@ -83,7 +83,7 @@ def create_expense(db: Session, group: Group, actor_user_id: str | None, *, desc
                    payer_member_id: str, participant_ids: list[str], occurred_at: datetime,
                    subcategory: str | None = None, merchant: str | None = None, payment_method: str = "mobile_wallet",
                    split_method: str = "equal", split_values: dict[str, float] | None = None,
-                   notes: str | None = None) -> tuple[Expense, dict, dict]:
+                   notes: str | None = None, notify: bool = True) -> tuple[Expense, dict, dict]:
     members = {m.id: m for m in db.scalars(select(GroupMember).where(GroupMember.group_id == group.id))}
     active = {mid for mid, m in members.items() if m.status == "active"}
     if payer_member_id not in active:
@@ -122,8 +122,10 @@ def create_expense(db: Session, group: Group, actor_user_id: str | None, *, desc
                              "signals": prediction["signals"]}))
     anomaly = score_expense(db, expense, len(active))
     apply_anomaly_result(db, expense, anomaly)
-    group.data_version += 1
+    group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
 
+    if not notify:  # bulk imports send one summary notification instead
+        return expense, prediction, anomaly
     payer_name = members[payer_member_id].display_name
     actor_member = next((m for m in members.values() if m.user_id == actor_user_id), None)
     notify_members(db, group, exclude_user_id=actor_user_id, kind="expense",
@@ -149,6 +151,6 @@ def recategorize(db: Session, group: Group, expense: Expense, subcategory: str, 
     expense.category_source = "user"
     db.add(CategoryFeedback(group_id=group.id, expense_id=expense.id, user_id=user_id, text=_norm(expense.description)[:240],
                             predicted_subcategory=previous, corrected_subcategory=sub.key))
-    group.data_version += 1
+    group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
 
 

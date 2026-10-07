@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CircleCheck, FlaskConical, Loader2, PiggyBank, Plus, Target, TriangleAlert, Users } from "lucide-react";
+import { ArrowLeft, CircleCheck, FlaskConical, Loader2, PiggyBank, Plus, Target, TriangleAlert, Users, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { WalletPayDialog } from "@/components/wallet/wallet-pay-dialog";
 import { api } from "@/lib/api";
 import { fmtDate, fmtDateYear, likelihood, taka } from "@/lib/format";
 import { useGoal, useGroup, useInvalidateGroup } from "@/lib/queries";
@@ -28,6 +29,7 @@ export default function GoalDetailPage() {
   const [member, setMember] = useState("");
   const [amount, setAmount] = useState("");
   const [busy, setBusy] = useState(false);
+  const [walletOpen, setWalletOpen] = useState(false);
 
   async function contribute(e: React.FormEvent) {
     e.preventDefault();
@@ -72,13 +74,13 @@ export default function GoalDetailPage() {
             {g.description ? ` · ${g.description}` : ""}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <LinkButton href={`/g/${groupId}/what-if?goal=${goalId}${reduce ? `&cat=Food&pct=-${Math.min(40, Math.ceil((reduce.reduction_pct ?? 10) / 5) * 5)}` : ""}`} variant="outline">
             <FlaskConical className="size-4" aria-hidden /> What-If
           </LinkButton>
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger render={<Button />}>
-              <Plus className="size-4" aria-hidden /> Add contribution
+            <DialogTrigger render={<Button variant="outline" />}>
+              <Plus className="size-4" aria-hidden /> Record contribution
             </DialogTrigger>
             <DialogContent className="sm:max-w-sm">
               <form onSubmit={contribute} className="space-y-4">
@@ -116,8 +118,25 @@ export default function GoalDetailPage() {
               </form>
             </DialogContent>
           </Dialog>
+          {g.status !== "achieved" && (
+            <Button onClick={() => setWalletOpen(true)}>
+              <Wallet className="size-4" aria-hidden /> Save via wallet
+            </Button>
+          )}
         </div>
       </div>
+      {walletOpen && (
+        <WalletPayDialog
+          groupId={groupId}
+          open={walletOpen}
+          onOpenChange={setWalletOpen}
+          purpose="goal_contribution"
+          goalId={goalId}
+          goalTitle={g.title}
+          defaultAmount={p.required_monthly ? Math.round(p.required_monthly / 4 / 100) * 100 : undefined}
+          returnTo={`/g/${groupId}/goals/${goalId}`}
+        />
+      )}
 
       <div className="grid gap-5 xl:grid-cols-[1fr_360px]">
         <div className="space-y-5">

@@ -15,7 +15,7 @@ from sqlalchemy.dialects import postgresql  # noqa: E402
 from sqlalchemy.schema import CreateIndex, CreateTable  # noqa: E402
 
 from app import models  # noqa: E402,F401
-from app.db import Base  # noqa: E402
+from app.db import Base, rls_statements  # noqa: E402
 
 
 def main() -> None:
@@ -27,10 +27,11 @@ def main() -> None:
         for index in table.indexes:
             print(str(CreateIndex(index).compile(dialect=dialect)).strip() + ";")
         print()
-    print("-- The API (server-side, postgres role) is the only data path. Enabling RLS with no policies")
-    print("-- blocks the public anon/authenticated roles from reading these tables via the Data API.")
-    for table in Base.metadata.sorted_tables:
-        print(f'ALTER TABLE "{table.name}" ENABLE ROW LEVEL SECURITY;')
+    print("-- Row-level security. The API (table owner) is the only write path. Through Supabase's Data API:")
+    print("-- anon reads nothing; a signed-in user reads only rows of groups they are an active member of")
+    print("-- (plus their own profile and notifications); security and operational tables are API-only.")
+    for stmt in rls_statements("public"):
+        print(stmt + ";")
 
 
 if __name__ == "__main__":

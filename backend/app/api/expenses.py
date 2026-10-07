@@ -12,7 +12,7 @@ from ..core.splits import SplitError, compute_split
 from ..db import get_db
 from ..ml.taxonomy import SUBCATEGORIES, get_subcategory
 from ..ml.text import parse_expense_text
-from ..models import Expense, ExpenseSplit, GroupMember, Settlement, User
+from ..models import Expense, ExpenseSplit, Group, GroupMember, Settlement, User
 from ..schemas import CategorizeIn, CategoryIn, ExpenseCreateIn, ExpenseUpdateIn, ReviewIn, SettlementIn
 from ..services.expenses import ExpenseError, apply_anomaly_result, categorize, create_expense, recategorize, score_expense
 from ..services.notifications import notify_members
@@ -140,7 +140,7 @@ def update_expense(expense_id: str, body: ExpenseUpdateIn, access: GroupAccess =
     if e.anomaly_status in ("flagged", "none"):
         n_active = len(active)
         apply_anomaly_result(db, e, score_expense(db, e, n_active))
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return expense_out(e, member_names(db, access.group.id), detail=True)
 
@@ -149,7 +149,7 @@ def update_expense(expense_id: str, body: ExpenseUpdateIn, access: GroupAccess =
 def delete_expense(expense_id: str, access: GroupAccess = Depends(group_access), db: Session = Depends(get_db)) -> dict:
     e = _get_expense(db, access, expense_id)
     e.is_deleted = True
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return {"ok": True}
 
@@ -160,7 +160,7 @@ def review_anomaly(expense_id: str, body: ReviewIn, access: GroupAccess = Depend
     """Human oversight: AI flags, people decide. Nothing is ever blocked automatically."""
     e = _get_expense(db, access, expense_id)
     e.anomaly_status = {"valid": "valid", "dismiss": "dismissed", "reopen": "flagged"}[body.action]
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     db.commit()
     return expense_out(e, member_names(db, access.group.id), detail=True)
 
@@ -203,7 +203,7 @@ def record_settlement(body: SettlementIn, access: GroupAccess = Depends(group_ac
                    amount_paisa=amount, occurred_at=_naive_local(body.occurred_at), note=body.note,
                    created_by_user_id=access.user.id)
     db.add(s)
-    access.group.data_version += 1
+    access.group.data_version = Group.data_version + 1  # atomic in SQL: no lost updates
     notify_members(db, access.group, exclude_user_id=access.user.id, kind="settlement",
                    title=f"Settlement recorded in {access.group.name}",
                    body=f"{members[body.from_member_id].display_name} paid {members[body.to_member_id].display_name} "

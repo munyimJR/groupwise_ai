@@ -96,3 +96,18 @@ def test_pairwise_debts_net_out_reverse_directions():
     ]
     assert pairwise_debts(exps) == {("B", "A"): 50}
     assert pairwise_debts(exps, [SettlementRecord("B", "A", 50)]) == {}
+
+
+def test_row_level_security_enabled_on_postgres():
+    """On PostgreSQL every table has RLS on, so Supabase's public roles can't read data around the API."""
+    import pytest
+    from sqlalchemy import text
+
+    from app.db import Base, engine
+
+    if engine.dialect.name != "postgresql":
+        pytest.skip("PostgreSQL only (runs in CI)")
+    with engine.connect() as conn:
+        rows = dict(conn.execute(text("select relname, relrowsecurity from pg_class where relkind = 'r' "
+                                      "and relnamespace = current_schema()::regnamespace")).all())
+    assert all(rows.get(t.name) for t in Base.metadata.sorted_tables)

@@ -1,4 +1,4 @@
-# Demo script (≈ 90 seconds, desktop)
+# Demo script (about 2½ minutes, desktop)
 
 **Setup:** open the live URL → **Explore the live demo**. You land on *DIU CSE Squad*. (Every visitor gets a private sandbox, so add and edit freely.)
 
@@ -15,7 +15,10 @@
 | 9 | **Ask GroupWise** → "Why did our spending increase?" | "Grounded copilot: the answer cites facts [F1], [F2]…, and every figure is verified against the data. Here's the evidence panel, typed as fact, prediction, assumption or recommendation." |
 | 10 | Back to the dashboard → **Recommended action** | "The recommendation engine proposes reducing weekend dining *and simulates the outcome*: goal progress 74% → 106%. You can mark it helpful or dismiss it. AI recommends; the group decides." |
 | 11 | (Optional) **Group dynamics** | "Observable payments only: Rony fronts most costs, so it suggests rotating the payer for big expenses. No judgments about people." |
-| 12 | (Optional) **Balances** | "Exact ledger: 4 payments settle everyone instead of 10. That part is a deterministic algorithm, not AI." |
+| 12 | **Import from wallet** → **Use a sample statement** | "Most shared costs are already paid from a mobile wallet. This is a wallet statement export (synthetic for the demo). The AI categorizes every purchase and suggests what's shared, skips personal things like a mobile recharge, and notices that sending money to Rony was paying him back. Nothing is added until I confirm." |
+| 13 | Import → **Balances** → **Request via wallet** (Shuvo) | "Settle-up runs on the wallet's own rails, like bKash's Request Money. GroupWise creates a payment request with a reference; the wallet confirms with a signed message, and only then is it recorded. The approval screen here is a labeled sandbox, so no real money moves." |
+| 14 | **Shuvo pays** → back to balances | "Signed, amount-checked and idempotent, so a replayed or tampered confirmation is rejected. 4 payments settle everyone instead of 10, and that part is exact math, not AI." |
+| 15 | (Optional) Goal → **Save via wallet** | "Members can put money toward the trip straight from their wallet. In upay this would be a goal wallet next to the multi-wallets it already has." |
 
 **Closing line:** *"GroupWise AI doesn't just tell groups where their money went. It helps them understand what is happening, anticipate what comes next, and make better financial decisions together."*
 
@@ -25,4 +28,5 @@ Open the same URL on a phone (or the browser's device mode): the bottom nav with
 ### Questions judges may ask
 - *Is the AI just an LLM?* No. Categorization, anomaly detection, forecasting and goal simulation are ML/statistical models with held-out evaluation (see *How the AI works*). The LLM only words verified facts, and it's optional.
 - *What if the LLM hallucinates a number?* The grounding check rejects any figure not in the facts and shows the deterministic answer instead.
-- *Real data?* No. Everything is synthetic. The roadmap is prototype validation, then governed or anonymized data, then potential MFS integration.
+- *Real data?* The demo data is synthetic. Real-user evidence is being collected with a survey, interviews and a 2-week pilot ([research/](../research/README.md)), and public evidence is in [PROBLEM_EVIDENCE.md](PROBLEM_EVIDENCE.md). We show survey numbers only once collected.
+- *Is the wallet link real?* Everything except the wallet's approval screen is real: statement parsing and import, payment requests, and HMAC-signed confirmations with replay and amount checks. A partner integration replaces the sandbox with their API ([MFS_INTEGRATION.md](MFS_INTEGRATION.md)). It is a possible path, not an official partnership.

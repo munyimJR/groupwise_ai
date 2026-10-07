@@ -1,0 +1,514 @@
+{
+  "generated_at": "2026-10-07 03:41 UTC",
+  "label": "Synthetic-data validation",
+  "categorizer": {
+    "splits": {
+      "train": 1044,
+      "test": 244,
+      "classes": 34,
+      "construction": "Per subcategory, 25% of merchants and 25% of phrasing templates are held out. Every test example uses a held-out merchant, a held-out phrasing, or both.",
+      "hyperparameter_selection": {
+        "method": "5-fold CV on the training split",
+        "cv_accuracy_by_C": {
+          "1.0": 0.9272,
+          "3.0": 0.9463,
+          "12.0": 0.9502,
+          "30.0": 0.9511
+        },
+        "chosen_C": 30.0
+      }
+    },
+    "leakage": {
+      "exact_text_overlap_test_in_train": 1,
+      "removed_from_test": 1,
+      "merchant_prior": "Excluded from all test metrics: the merchant knowledge base contains held-out merchants, so using it at test time would leak.",
+      "test_used_for_tuning": false
+    },
+    "comparison": {
+      "Majority class": {
+        "sub_accuracy": 0.082,
+        "sub_accuracy_ci": [
+          0.0492,
+          0.1148
+        ],
+        "sub_f1_macro": 0.0045,
+        "category_accuracy": 0.2295
+      },
+      "Keyword rules (simple baseline)": {
+        "sub_accuracy": 0.6557,
+        "sub_accuracy_ci": [
+          0.5902,
+          0.7172
+        ],
+        "sub_f1_macro": 0.6785,
+        "category_accuracy": 0.709
+      },
+      "Naive Bayes (word counts)": {
+        "sub_accuracy": 0.7459,
+        "sub_accuracy_ci": [
+          0.6926,
+          0.7992
+        ],
+        "sub_f1_macro": 0.7626,
+        "category_accuracy": 0.791
+      },
+      "TF-IDF words only + LR": {
+        "sub_accuracy": 0.791,
+        "sub_accuracy_ci": [
+          0.7418,
+          0.8362
+        ],
+        "sub_f1_macro": 0.8035,
+        "category_accuracy": 0.8238
+      },
+      "TF-IDF characters only + LR": {
+        "sub_accuracy": 0.8156,
+        "sub_accuracy_ci": [
+          0.7664,
+          0.8607
+        ],
+        "sub_f1_macro": 0.7957,
+        "category_accuracy": 0.8402
+      },
+      "GroupWise as deployed (C = 12)": {
+        "sub_accuracy": 0.8033,
+        "sub_accuracy_ci": [
+          0.7459,
+          0.8525
+        ],
+        "sub_f1_macro": 0.797,
+        "category_accuracy": 0.832
+      },
+      "GroupWise, CV-selected C = 30": {
+        "sub_accuracy": 0.8156,
+        "sub_accuracy_ci": [
+          0.7664,
+          0.8607
+        ],
+        "sub_f1_macro": 0.8117,
+        "category_accuracy": 0.8402
+      }
+    },
+    "calibration": {
+      "ece": 0.1169,
+      "brier": 0.2571,
+      "reliability": [
+        {
+          "bin": "0.0–0.1",
+          "n": 15,
+          "mean_confidence": 0.078,
+          "accuracy": 0.133
+        },
+        {
+          "bin": "0.1–0.2",
+          "n": 14,
+          "mean_confidence": 0.149,
+          "accuracy": 0.214
+        },
+        {
+          "bin": "0.2–0.3",
+          "n": 11,
+          "mean_confidence": 0.252,
+          "accuracy": 0.455
+        },
+        {
+          "bin": "0.3–0.4",
+          "n": 11,
+          "mean_confidence": 0.351,
+          "accuracy": 0.455
+        },
+        {
+          "bin": "0.4–0.5",
+          "n": 11,
+          "mean_confidence": 0.45,
+          "accuracy": 0.727
+        },
+        {
+          "bin": "0.5–0.6",
+          "n": 11,
+          "mean_confidence": 0.56,
+          "accuracy": 0.727
+        },
+        {
+          "bin": "0.6–0.7",
+          "n": 23,
+          "mean_confidence": 0.655,
+          "accuracy": 0.957
+        },
+        {
+          "bin": "0.7–0.8",
+          "n": 16,
+          "mean_confidence": 0.754,
+          "accuracy": 0.875
+        },
+        {
+          "bin": "0.8–0.9",
+          "n": 38,
+          "mean_confidence": 0.85,
+          "accuracy": 1.0
+        },
+        {
+          "bin": "0.9–1.0",
+          "n": 94,
+          "mean_confidence": 0.958,
+          "accuracy": 1.0
+        }
+      ],
+      "selective": [
+        {
+          "threshold": 0.3,
+          "auto_accepted_share": 0.836,
+          "accuracy_when_auto": 0.926
+        },
+        {
+          "threshold": 0.45,
+          "auto_accepted_share": 0.77,
+          "accuracy_when_auto": 0.968
+        },
+        {
+          "threshold": 0.6,
+          "auto_accepted_share": 0.701,
+          "accuracy_when_auto": 0.982
+        },
+        {
+          "threshold": 0.8,
+          "auto_accepted_share": 0.541,
+          "accuracy_when_auto": 1.0
+        }
+      ]
+    },
+    "calibration_temperature_scaled": {
+      "temperature": 0.6,
+      "ece": 0.0294,
+      "brier": 0.232,
+      "reliability": [
+        {
+          "bin": "0.0–0.1",
+          "n": 3,
+          "mean_confidence": 0.092,
+          "accuracy": 0.0
+        },
+        {
+          "bin": "0.1–0.2",
+          "n": 13,
+          "mean_confidence": 0.145,
+          "accuracy": 0.154
+        },
+        {
+          "bin": "0.2–0.3",
+          "n": 5,
+          "mean_confidence": 0.277,
+          "accuracy": 0.0
+        },
+        {
+          "bin": "0.3–0.4",
+          "n": 10,
+          "mean_confidence": 0.347,
+          "accuracy": 0.3
+        },
+        {
+          "bin": "0.4–0.5",
+          "n": 5,
+          "mean_confidence": 0.437,
+          "accuracy": 0.4
+        },
+        {
+          "bin": "0.5–0.6",
+          "n": 7,
+          "mean_confidence": 0.554,
+          "accuracy": 0.429
+        },
+        {
+          "bin": "0.6–0.7",
+          "n": 6,
+          "mean_confidence": 0.643,
+          "accuracy": 0.333
+        },
+        {
+          "bin": "0.7–0.8",
+          "n": 8,
+          "mean_confidence": 0.757,
+          "accuracy": 0.75
+        },
+        {
+          "bin": "0.8–0.9",
+          "n": 11,
+          "mean_confidence": 0.852,
+          "accuracy": 0.727
+        },
+        {
+          "bin": "0.9–1.0",
+          "n": 176,
+          "mean_confidence": 0.986,
+          "accuracy": 0.983
+        }
+      ],
+      "selective": [
+        {
+          "threshold": 0.3,
+          "auto_accepted_share": 0.914,
+          "accuracy_when_auto": 0.883
+        },
+        {
+          "threshold": 0.45,
+          "auto_accepted_share": 0.861,
+          "accuracy_when_auto": 0.914
+        },
+        {
+          "threshold": 0.6,
+          "auto_accepted_share": 0.824,
+          "accuracy_when_auto": 0.94
+        },
+        {
+          "threshold": 0.8,
+          "auto_accepted_share": 0.766,
+          "accuracy_when_auto": 0.968
+        }
+      ]
+    },
+    "stress_set": {
+      "n": 70,
+      "source": "hand-written descriptions outside the generator's templates",
+      "groupwise": {
+        "sub_accuracy": 0.9143,
+        "sub_accuracy_ci": [
+          0.8429,
+          0.9714
+        ],
+        "sub_f1_macro": 0.9149,
+        "category_accuracy": 0.9143
+      },
+      "keyword_rules": {
+        "sub_accuracy": 0.6857,
+        "sub_accuracy_ci": [
+          0.5714,
+          0.8
+        ],
+        "sub_f1_macro": 0.7152,
+        "category_accuracy": 0.7286
+      },
+      "errors": [
+        {
+          "text": "ordered khichuri online for the flat",
+          "true": "Food Delivery",
+          "predicted": "Electronics"
+        },
+        {
+          "text": "toothpaste soap and detergent from super shop",
+          "true": "Supermarket",
+          "predicted": "Household Supplies"
+        },
+        {
+          "text": "flexiload 100 taka",
+          "true": "Mobile Recharge",
+          "predicted": "Cafe & Snacks"
+        },
+        {
+          "text": "pc game top up",
+          "true": "Gaming",
+          "predicted": "Fuel"
+        },
+        {
+          "text": "fest entry fee for the club",
+          "true": "Events & Concerts",
+          "predicted": "Clothing"
+        },
+        {
+          "text": "khata and marker for the project",
+          "true": "Books & Stationery",
+          "predicted": "Electronics"
+        }
+      ]
+    }
+  },
+  "anomaly": {
+    "splits": {
+      "tuning_seeds": "0–39",
+      "test_seeds": "100–139",
+      "note": "Weights and thresholds were chosen on the tuning seeds only."
+    },
+    "comparison": {
+      "Rule: amount > 3x the group's median for that subcategory": {
+        "threshold": 1.05,
+        "precision": 0.6196,
+        "recall": 0.4372,
+        "f1": 0.5127,
+        "f1_ci": [
+          0.4537,
+          0.5853
+        ]
+      },
+      "Robust z-score only (amount vs subcategory and group)": {
+        "threshold": 0.2,
+        "precision": 0.6755,
+        "recall": 0.5498,
+        "f1": 0.6062,
+        "f1_ci": [
+          0.5341,
+          0.6713
+        ]
+      },
+      "Isolation Forest only": {
+        "threshold": 0.35,
+        "precision": 0.5316,
+        "recall": 0.4372,
+        "f1": 0.4798,
+        "f1_ci": [
+          0.429,
+          0.5353
+        ]
+      },
+      "Rules only (night-time, rare category, duplicate)": {
+        "threshold": 0.2,
+        "precision": 0.799,
+        "recall": 0.7229,
+        "f1": 0.7591,
+        "f1_ci": [
+          0.7089,
+          0.8038
+        ]
+      },
+      "Hybrid without Isolation Forest": {
+        "threshold": 0.6,
+        "precision": 0.9474,
+        "recall": 0.8571,
+        "f1": 0.9,
+        "f1_ci": [
+          0.8604,
+          0.9347
+        ]
+      },
+      "GroupWise hybrid (all signals)": {
+        "threshold": 0.6,
+        "precision": 0.9102,
+        "recall": 0.9654,
+        "f1": 0.937,
+        "f1_ci": [
+          0.9055,
+          0.9602
+        ]
+      }
+    },
+    "threshold_sweep_validation": [
+      {
+        "threshold": 0.4,
+        "precision": 0.629,
+        "recall": 0.963,
+        "f1": 0.761
+      },
+      {
+        "threshold": 0.5,
+        "precision": 0.718,
+        "recall": 0.963,
+        "f1": 0.823
+      },
+      {
+        "threshold": 0.6,
+        "precision": 0.896,
+        "recall": 0.929,
+        "f1": 0.912
+      },
+      {
+        "threshold": 0.7,
+        "precision": 0.951,
+        "recall": 0.801,
+        "f1": 0.869
+      },
+      {
+        "threshold": 0.8,
+        "precision": 0.959,
+        "recall": 0.577,
+        "f1": 0.72
+      }
+    ],
+    "prospective": {
+      "window_days": 28,
+      "online_past_only": {
+        "precision": 0.8889,
+        "recall": 0.9302,
+        "f1": 0.9091,
+        "anomalies": 43
+      },
+      "batch_same_transactions": {
+        "precision": 0.9318,
+        "recall": 0.9535,
+        "f1": 0.9425,
+        "anomalies": 43
+      }
+    }
+  },
+  "forecast": {
+    "splits": {
+      "test_seeds": "100–119",
+      "windows": 160,
+      "method": "Rolling origin: 8 weekly cut-offs per group; each forecast is fitted only on data before its cut-off and scored on the next 7 days."
+    },
+    "comparison": {
+      "Mean of previous 28 days": {
+        "mae_7day": 8261,
+        "mae_ci": [
+          6318,
+          10067
+        ]
+      },
+      "Last week repeated": {
+        "mae_7day": 9122,
+        "mae_ci": [
+          7225,
+          11011
+        ]
+      },
+      "Same weekday, 4-week average": {
+        "mae_7day": 8261,
+        "mae_ci": [
+          6432,
+          10063
+        ]
+      },
+      "GroupWise without recurring bills": {
+        "mae_7day": 6512,
+        "mae_ci": [
+          5248,
+          7704
+        ]
+      },
+      "GroupWise without weekday/month factors": {
+        "mae_7day": 3667,
+        "mae_ci": [
+          3004,
+          4286
+        ]
+      },
+      "GroupWise without recency weighting": {
+        "mae_7day": 3394,
+        "mae_ci": [
+          2816,
+          4054
+        ]
+      },
+      "GroupWise forecast": {
+        "mae_7day": 3625,
+        "mae_ci": [
+          2966,
+          4305
+        ]
+      }
+    },
+    "improvement_vs_mean28": {
+      "pct": 56.1,
+      "ci_pct": [
+        40.7,
+        67.8
+      ]
+    },
+    "interval_80": {
+      "windows": 160,
+      "coverage": 0.769,
+      "coverage_before_tuning": 0.65,
+      "tuning": "10th-90th percentile of the group's own backtest errors, widened 1.75x; the widening was chosen on validation seeds 0-19 (80.5% coverage there)"
+    },
+    "leakage": {
+      "future_data_changes_forecast": false
+    }
+  }
+}

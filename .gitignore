@@ -26,3 +26,7 @@ Thumbs.db
 # Vercel
 .vercel
 backend/tests/_test.db*
+
+# Raw research exports stay private (summaries in research/results/*.md|json are fine to commit)
+research/**/*.csv
+research/raw/

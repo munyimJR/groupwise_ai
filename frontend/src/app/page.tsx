@@ -10,11 +10,12 @@ import {
   FlaskConical,
   Lock,
   Receipt,
-  Scale,
   ShieldCheck,
   Tags,
   Target,
   TrendingUp,
+  Users,
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -46,7 +47,7 @@ const FEATURES = [
   { icon: Target, title: "Goal planner", method: "Projection + Monte-Carlo simulation", body: "Will the trip fund make it? See the projected gap, the likelihood, and what would close it." },
   { icon: FlaskConical, title: "What-If simulator", method: "Scenario engine on the forecast", body: "Cut dining 15%? Expenses up 20%? See savings, pressure and goal impact instantly." },
   { icon: Bot, title: "Ask GroupWise", method: "Grounded LLM copilot", body: "Ask in plain English. Answers cite computed facts, and every figure is verified against your data." },
-  { icon: Scale, title: "Settle up, simplified", method: "Deterministic algorithm — not AI", body: "Exact balances and the minimum set of payments to clear everyone." },
+  { icon: Wallet, title: "Wallet-connected settle-up", method: "Wallet integration · exact math, not AI", body: "Import your wallet's transactions (auto-categorized), then pay or request through the wallet. Fewest payments, recorded only when the wallet confirms." },
 ];
 
 const RESPONSIBLE = [

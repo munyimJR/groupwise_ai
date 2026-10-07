@@ -188,4 +188,4 @@ def test_sparse_group_every_endpoint_and_intent(client):
               "How healthy are we?", "What can we change to reach our goal?", "summary"):
         r = client.post(f"/api/groups/{gid}/copilot", headers=auth(tok), json={"question": q})
         assert r.status_code == 200, (q, r.text)
-        assert r.json()["grounding"]["passed"], q
+        assert r.json()["grounding"]["passed"], (q, r.json()["answer"], r.json()["grounding"])

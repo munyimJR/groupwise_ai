@@ -14,9 +14,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
-from .api import auth, expenses, groups, intelligence, meta, notifications
+from .api import auth, expenses, groups, intelligence, meta, notifications, wallet
 from .config import get_settings
 from .db import init_db
+from .services.audit import AuditMiddleware
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("groupwise")
@@ -42,6 +43,7 @@ settings = get_settings()
 app = FastAPI(title="GroupWise AI API", version="1.0.0", lifespan=lifespan,
               description="Shared financial intelligence: deterministic finance + ML + grounded LLM explanations.",
               docs_url="/api/docs", openapi_url="/api/openapi.json")
+app.add_middleware(AuditMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1024)
 app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origin_list, allow_credentials=False,
                    allow_methods=["*"], allow_headers=["Authorization", "Content-Type"])
@@ -63,7 +65,8 @@ async def unhandled(request: Request, exc: Exception):  # never leak internals t
     return JSONResponse(status_code=500, content={"detail": "Something went wrong on our side. Please try again."})
 
 
-for r in (meta.router, auth.router, groups.router, expenses.router, intelligence.router, notifications.router):
+for r in (meta.router, auth.router, groups.router, expenses.router, intelligence.router, notifications.router,
+          wallet.router):
     app.include_router(r, prefix="/api")
 
 

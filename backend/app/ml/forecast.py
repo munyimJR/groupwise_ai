@@ -184,6 +184,24 @@ class SeasonalForecaster:
         return rows
 
 
+# Range shown with each forecast: empirical quantiles of the group's own backtest errors, widened by a factor.
+# Only ~8 backtest windows exist per group, so raw 10th/90th percentiles are too narrow; the widening was tuned on
+# validation seeds (scripts/validate_models.py) to reach about 80% coverage, then checked on separate test seeds.
+INTERVAL_QUANTILES = (0.1, 0.9)
+INTERVAL_WIDEN = 1.75
+INTERVAL_MIN = 0.08
+
+
+def interval_factors(rel_errors: list[float], quantiles: tuple[float, float] | None = None,
+                     widen: float | None = None) -> tuple[float, float]:
+    """Multipliers (low, high) applied to the point forecast for the ~80% range."""
+    q_lo, q_hi = quantiles or INTERVAL_QUANTILES
+    k = INTERVAL_WIDEN if widen is None else widen
+    lo = float(np.quantile(rel_errors, q_lo)) * k
+    hi = float(np.quantile(rel_errors, q_hi)) * k
+    return 1 + min(lo, -INTERVAL_MIN), 1 + max(hi, INTERVAL_MIN)
+
+
 def backtest(txns: list[SpendTxn], as_of: date, n_origins: int = 8, horizon: int = 7,
              half_life: float | None = None) -> dict:
     """Rolling-origin evaluation on the group's own history (weekly cut-offs).
@@ -238,6 +256,7 @@ def backtest(txns: list[SpendTxn], as_of: date, n_origins: int = 8, horizon: int
         "bias_pct": float(np.mean(rel_errors)) * 100,
         "rel_error_q10": float(np.quantile(rel_errors, 0.1)),
         "rel_error_q90": float(np.quantile(rel_errors, 0.9)),
+        "rel_errors": [float(e) for e in rel_errors],
     }
 
 
@@ -263,7 +282,7 @@ def forecast_group(txns: list[SpendTxn], as_of: date, horizon: int = 7, with_bac
     bt = backtest(txns, as_of) if with_backtest else {"n_windows": 0}
 
     if bt.get("n_windows", 0) >= 4:
-        lo_f, hi_f = 1 + min(bt["rel_error_q10"], -0.08), 1 + max(bt["rel_error_q90"], 0.08)
+        lo_f, hi_f = interval_factors(bt["rel_errors"])
         mape = bt["weekly_mape"]
         confidence = "high" if mape < 0.15 and history_days >= 60 else ("medium" if mape < 0.3 else "low")
     else:

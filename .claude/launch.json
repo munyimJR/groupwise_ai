@@ -8,6 +8,12 @@
       "port": 8000
     },
     {
+      "name": "backend-local",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set DATABASE_URL=sqlite:///./groupwise.db&& backend\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --app-dir backend --port 8000"],
+      "port": 8000
+    },
+    {
       "name": "frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "frontend", "run", "dev"],

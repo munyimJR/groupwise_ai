@@ -23,6 +23,16 @@ Track 03 — Customer Innovation & Financial Independence · AI Hackathon protot
 
 No accounts or keys are needed to run it locally: by default it uses SQLite, built-in accounts and deterministic copilot answers. Supabase and Claude are optional ([§14](#14-environment-variables)).
 
+### What changed after Phase 1 feedback
+
+| Judges said | What we did |
+|---|---|
+| "No survey or user evidence" | Public evidence with sources ([docs/PROBLEM_EVIDENCE.md](docs/PROBLEM_EVIDENCE.md)). A ready-to-run research kit ([research/](research/README.md)): anonymous survey with a Google Form generator, analysis script with margins of error, interview guide, and a 2-week pilot whose metrics are computed automatically from real accounts (`scripts/pilot_metrics.py`). No invented numbers. |
+| "Narrow the problem around one high-value MFS use case" | One use case: **shared spending plus one shared goal** for a student group that pays from mobile wallets ([§2](#2-problem-statement)). |
+| "The wallet / upay link is weak and conceptual" | Built it: **wallet statement import** (AI-categorized), **pay or request through the wallet** with signed (HMAC) confirmations, and **save to the goal via wallet**. The wallet's approval screen is a clearly labeled sandbox ([docs/MFS_INTEGRATION.md](docs/MFS_INTEGRATION.md)). |
+| "Metrics come from self-made synthetic data; baselines are weak; the number of ML models is overstated" | A rigorous validation ([docs/MODEL_VALIDATION.md](docs/MODEL_VALIDATION.md)) covering explicit train/validation/test construction, leakage checks (including a past-only temporal check), simple-rule baselines, ablations of every component, calibration and 95% confidence intervals, plus a hand-written test set the generator never produced. It found two real problems, which we fixed: a too-narrow forecast range and an under-confident categorizer. We now say **two learned models plus one statistical forecaster**, not "five ML models". |
+| "What-If and 10→4 payments are scenario math, not measured behavior; no upay business case" | A **controlled experiment** built into the app: group-level A/B arms, retention logging and an outcome report with confidence intervals, pre-registered in [research/experiment/](research/experiment/EXPERIMENT_PLAN.md). A transparent **upay business case** ([docs/BUSINESS_CASE.md](docs/BUSINESS_CASE.md)) whose every assumption names the pilot metric that replaces it. Simulated outputs are no longer presented as impact. |
+
 ---
 
 ## 1. Project overview
@@ -41,11 +51,22 @@ TRANSACTION DATA → FINANCIAL INTELLIGENCE → UNDERSTANDING → PREDICTION →
 
 ## 2. Problem statement
 
-> For students and young adults who regularly share expenses, fragmented group spending makes it difficult to track shared financial responsibility, understand spending behavior, predict upcoming financial pressure, and make better financial decisions.
+> **Student groups in Bangladesh pay shared costs from mobile wallets, but nothing connects those payments into a shared picture. They lose track of who paid, wait days to be paid back, and their shared savings goals quietly fail.**
+
+GroupWise focuses on **one high-value mobile-wallet use case: shared spending plus one shared goal** for a group of 3–8 students (a flat, a friend group or a trip):
+
+```
+Wallet payments  →  one shared ledger  →  settle up through the wallet  →  save toward the goal on time
+   (import)            (AI sorts it)          (pay / request)                (goal planner + What-If)
+```
+
+Insights, forecasts and the copilot exist to keep that loop working.
 
 ## 3. Target users
 
 The first version is designed specifically for **university students and young adults in Bangladesh who share costs**: roommates, classmates who eat and travel together, trip groups and event or club groups. Examples include the Bangladesh weekend (Friday–Saturday, with Thursday night as the start), Banglish expense descriptions (“basha bhara”, “biddut bill”, “nasta”), local merchants and amounts in taka (৳).
+
+About **4.82 million students** study in Bangladesh's public universities and affiliated colleges (UGC, 2023 data), and Bangladesh had **239.3 million mobile-wallet (MFS) accounts** in January 2025 (Bangladesh Bank data). Sources and how we are validating the problem with real students are in [docs/PROBLEM_EVIDENCE.md](docs/PROBLEM_EVIDENCE.md).
 
 ## 4. Why this problem matters
 
@@ -53,13 +74,15 @@ The first version is designed specifically for **university students and young a
 - Groups rarely see pressure coming. Weekend outings, month-start spikes and rent week arrive as surprises.
 - Shared goals such as a trip fund often fail silently, with no early signal that the pace is too slow.
 - Data-entry mistakes (a ৳16,500 that should have been ৳1,650) flow straight into everyone's balances.
+- **The money already moves through wallets, but the shared picture doesn't.** MFS transactions reached about Tk 1.72 trillion in January 2025 alone. bKash's *Request Money* already lets people split a bill among friends, so wallets move the money. No wallet keeps the group's shared ledger, explains its spending or manages a shared goal.
+- **Primary evidence is being collected:** a survey of DIU students, interviews and a 2-week pilot ([research/](research/README.md)). Results are published only once collected.
 
 ## 5. Solution
 
 GroupWise combines a **deterministic, exact ledger** with **purpose-built ML and analytics**, and uses an **LLM only to explain computed facts**:
 
-1. Record expenses naturally: “Lunch at Kacchi Bhai 850” is parsed and categorized.
-2. Balances and the minimum settle-up plan are computed exactly, to the paisa.
+1. Record expenses naturally (“Lunch at Kacchi Bhai 850” is parsed and categorized), or **import them from a wallet statement**. The AI sorts each transaction and spots paying a friend back.
+2. Balances and the minimum settle-up plan are computed exactly, to the paisa, and settled **through the wallet** (pay or request), recorded only after a signed confirmation.
 3. Analytics and ML explain what changed and why, flag unusual expenses, forecast the coming days, and project goals.
 4. A recommendation engine proposes actions and **simulates their outcome** with the What-If engine.
 5. *Ask GroupWise* answers questions in plain English, citing the facts it used, with every number verified against the data.
@@ -73,12 +96,15 @@ GroupWise combines a **deterministic, exact ledger** with **purpose-built ML and
 | Expenses | Natural-language entry, payer, participants, equal split (percentage & exact implemented in the engine), date/time, payment method, edit/delete | App |
 | **Balance engine** | Paid, share, settlements, net (“Gets ৳X” / “Owes ৳X” with icon + text) | **Deterministic — not AI** |
 | **Debt simplification** | Greedy minimum cash-flow; ≤ n−1 payments (“4 payments instead of 10”) | **Deterministic — not AI** |
-| AI 1 · Smart categorization | Category › subcategory › type, confidence, alternatives, the words that drove it, “please confirm” when unsure; corrections remembered per group | ML classifier |
-| AI 2 · Spending intelligence | Period comparison, driver decomposition (“weekend restaurant spending accounts for 61% of the increase, mostly bigger bills”), weekday pattern, merchants, members | Statistical pattern detection |
-| AI 3 · Unusual expense detection | Score + reasons (“8.2× the usual upper range for Restaurant…”), review: mark valid / dismiss / edit; never blocks | Isolation Forest + robust stats + rules |
-| AI 4 · Cash-flow forecast | Next 7/14/30 days with an 80% range, pressure days, drivers, recurring bills, per-member expected share, backtest accuracy | Time-series model |
-| AI 5 · Goal planner | Saved, projected, gap, required pace, simulated likelihood, scenarios that close the gap | Projection + Monte-Carlo |
-| AI 6 · Group dynamics | Paid vs consumed shares, high-value payer share, reimbursement delays, contribution balance index, payer rotation suggestion | Behavioral analytics (observable payments only) |
+| **Wallet statement import** | Upload a wallet CSV export (flexible columns). Each purchase is categorized; shared vs personal and “paid back Rony” are suggested; duplicates are skipped by TrxID; the person confirms | ML categorizer + rules |
+| **Pay / request via wallet** | Settle-up payments and money requests run through the wallet. Recorded only after an HMAC-signed, amount-checked, idempotent confirmation. The approval screen is a labeled sandbox | Integration (deterministic) |
+| **Save via wallet** | Contributions to the shared goal from the wallet, so the goal planner tracks real money | Integration (deterministic) |
+| Smart categorization | Category › subcategory › type, confidence, alternatives, the words that drove it, “please confirm” when unsure; corrections remembered per group | ML classifier |
+| Spending intelligence | Period comparison, driver decomposition (“weekend restaurant spending accounts for 61% of the increase, mostly bigger bills”), weekday pattern, merchants, members | Statistical pattern detection |
+| Unusual expense detection | Score + reasons (“8.2× the usual upper range for Restaurant…”), review: mark valid / dismiss / edit; never blocks | Isolation Forest + robust stats + rules |
+| Cash-flow forecast | Next 7/14/30 days with an 80% range, pressure days, drivers, recurring bills, per-member expected share, backtest accuracy | Time-series model |
+| Goal planner | Saved, projected, gap, required pace, simulated likelihood, scenarios that close the gap | Projection + Monte-Carlo |
+| Group dynamics | Paid vs consumed shares, high-value payer share, reimbursement delays, contribution balance index, payer rotation suggestion | Behavioral analytics (observable payments only) |
 | **What If?** | Sliders per category, overall change, extra contributions → savings, pressure, per-member burden, goal impact | Simulation on the forecast |
 | **Ask GroupWise** | Grounded copilot with evidence chips, typed facts, numeric verification, graceful fallback | LLM explanation layer |
 | Financial health | Transparent weighted score with “How is this calculated?”, labeled *prototype indicator* | Formula |
@@ -189,16 +215,19 @@ groupwise_ai/
 │   ├── app/copilot/         intent detection + fact builders + grounded answer engine
 │   ├── app/llm/             Claude client (fallback-safe) + grounding check
 │   ├── app/synthetic/       behavior-driven generator, scenarios, seeding
-│   ├── app/services/        snapshot cache, expense lifecycle, notifications
-│   ├── app/api/             routers (auth, groups, expenses, intelligence, notifications, meta)
-│   ├── scripts/             evaluate_models, check_demo_robustness, export_schema, set_database_url
-│   └── tests/               22 tests (finance invariants, API flows, ML, grounding)
+│   ├── app/integrations/    mobile-wallet adapter: statement parsing, signed events, sandbox wallet
+│   ├── app/services/        snapshot cache, expense lifecycle, wallet flows, notifications
+│   ├── app/api/             routers (auth, groups, expenses, intelligence, wallet, notifications, meta)
+│   ├── scripts/             evaluate_models, check_demo_robustness, export_schema, set_database_url, pilot_metrics
+│   └── tests/               29 tests (finance invariants, API flows, ML, grounding, wallet, research)
 ├── frontend/                Next.js web app (mobile-first, PWA)
 │   └── src/app/             landing, auth, /groups, /g/[groupId]/{dashboard, add, transactions,
-│                            balances, insights, forecast, goals, what-if, ask, dynamics, members},
-│                            notifications, profile, join, how-it-works, offline
+│                            balances, import, insights, forecast, goals, what-if, ask, dynamics, members},
+│                            pay/[requestId] (wallet checkout), notifications, profile, join, how-it-works, offline
 ├── supabase/schema.sql      generated DDL + row-level security
-├── docs/                    architecture, synthetic data, model evaluation, demo script, deployment, design system
+├── research/                user research kit: survey + Google Form generator, analysis, interviews, pilot plan
+├── docs/                    architecture, problem evidence, MFS integration, synthetic data, model evaluation,
+│                            demo script, deployment, design system
 ├── render.yaml              API deployment blueprint
 └── start.bat                one-click local start on Windows (API + web app + browser)
 ```
@@ -239,6 +268,8 @@ cp .env.example .env.local    # BACKEND_URL=http://127.0.0.1:8000
 | `ANTHROPIC_API_KEY` | Enables natural-language copilot answers | empty (deterministic answers) |
 | `LLM_MODEL` / `LLM_EFFORT` | Claude model and effort | `claude-opus-5-5` / `low` |
 | `CORS_ORIGINS`, `PUBLIC_APP_URL` | Web origin and invite-link base URL | `http://localhost:3000` |
+| `WALLET_SANDBOX_ENABLED` | Wallet payment requests and the sandbox checkout | `true` |
+| `WALLET_WEBHOOK_SECRET` | HMAC key for signed wallet events at `/api/integrations/wallet/webhook` | empty (webhook disabled) |
 
 **Frontend (`frontend/.env.local`):** `BACKEND_URL`, plus optional `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (public publishable key only; legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` also works).
 
@@ -282,8 +313,9 @@ Open http://localhost:3000 and click **Explore the live demo**. The web app prox
 
 ```bash
 cd backend
-pytest                                   # 22 tests: finance invariants, randomized debt simplification,
-                                         # end-to-end API flows, ML behavior, grounding check, intents
+pytest                                   # 29 tests: finance invariants, randomized debt simplification,
+                                         # end-to-end API flows, ML behavior, grounding check, intents,
+                                         # wallet import, signed webhook (tamper/replay/amount), research script
 ruff check app scripts tests
 python -m scripts.evaluate_models        # model metrics on held-out synthetic data
 python -m scripts.check_demo_robustness  # demo narrative across 28 different "today" dates
@@ -303,11 +335,15 @@ CI runs all of the above on every push (`.github/workflows/ci.yml`).
 1. Open the app and click **Explore the live demo**. You get a private sandbox with three synthetic groups.
 2. Follow the 90-second script in [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md):
    dashboard → add *“Dinner at Kacchi Bhai 16500”* (AI categorization + unusual-expense dialog) → Insights (*why* food spending rose) → Forecast → Goal planner → **What-If** (cut dining 15%) → **Ask GroupWise** (“Why did our spending increase?”) → evidence chips → recommended action → simulated outcome.
-3. The *How the AI works* page shows model cards and evaluation metrics.
+3. **Wallet flow (about 60 seconds):** *Import from wallet* → **Use a sample statement** (synthetic) → review the AI suggestions → import. Then *Balances* → **Request via wallet** → approve in the sandbox checkout. Then the goal → **Save via wallet**.
+4. The *How the AI works* page shows model cards and evaluation metrics.
 
 ## 19. Known limitations
 
 - All models are validated on **synthetic data only**. Real-world performance needs validation on governed, anonymized data.
+- **Primary user research is in progress.** The survey, interviews and pilot are ready to run ([research/](research/README.md)); the report shows their results only once collected.
+- The wallet integration is real up to the wallet's approval screen, which is a **sandbox**. A live integration needs a partner's API and credentials. Statement import works with CSV exports; column names vary by provider and are matched by meaning.
+- General marketplaces confuse the categorizer (a Daraz electronics purchase can be read as household supplies). The person can always change the category before importing.
 - The forecast cannot anticipate genuine one-off events. For small or irregular groups the range is wide, and the app shows it.
 - The categorizer covers 34 Bangladesh-flavored subcategories. Unfamiliar merchants rely on context words, and the app asks for confirmation when unsure.
 - The demo sandbox is per-visitor and expires after 48 h. On free hosting the API may take up to a minute to wake.
@@ -321,6 +357,8 @@ CI runs all of the above on every push (`.github/workflows/ci.yml`).
 Synthetic data  →  Prototype validation with student groups  →  Controlled validation on governed,
 anonymized or aggregated data  →  Potential integration with an MFS backend
 ```
+
+The three wallet touch points (statement import, pay/request with signed confirmations, save to a goal) are already built against a sandbox. A real integration means swapping the sandbox for a partner adapter. See [docs/MFS_INTEGRATION.md](docs/MFS_INTEGRATION.md).
 
 Potential MFS value: deeper everyday utility for shared money, engagement around goals, personalized but explainable insights, and new financial-intelligence products, delivered with the same rule that **AI recommends and people decide**.
 

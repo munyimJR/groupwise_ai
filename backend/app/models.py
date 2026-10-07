@@ -218,6 +218,147 @@ class RecommendationAction(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
 
 
+class PaymentRequest(Base):
+    """A request to move money through a mobile wallet (settle a debt or fund a shared goal).
+
+    GroupWise never holds money. The wallet provider executes the payment and reports the outcome
+    with a signed event; only then is the settlement or goal contribution recorded.
+    """
+
+    __tablename__ = "payment_requests"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    group_id: Mapped[str] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"), index=True)
+    purpose: Mapped[str] = mapped_column(String(24))  # settlement|goal_contribution
+    payer_member_id: Mapped[str] = mapped_column(ForeignKey("group_members.id", ondelete="CASCADE"))
+    payee_member_id: Mapped[str | None] = mapped_column(ForeignKey("group_members.id", ondelete="CASCADE"))
+    goal_id: Mapped[str | None] = mapped_column(ForeignKey("goals.id", ondelete="CASCADE"))
+    amount_paisa: Mapped[int] = mapped_column(BigInteger)
+    reference: Mapped[str] = mapped_column(String(24), unique=True, index=True)
+    provider: Mapped[str] = mapped_column(String(24), default="sandbox")
+    status: Mapped[str] = mapped_column(String(16), default="pending")  # pending|paid|failed|cancelled|expired
+    provider_txn_id: Mapped[str | None] = mapped_column(String(64))
+    result_id: Mapped[str | None] = mapped_column(String(36))  # the settlement / contribution it produced
+    created_by_user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+
+class WalletImportItem(Base):
+    """One wallet-statement transaction already imported into a group (prevents double counting)."""
+
+    __tablename__ = "wallet_import_items"
+    __table_args__ = (UniqueConstraint("group_id", "member_id", "provider_txn_id", name="uq_wallet_import_txn"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    group_id: Mapped[str] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"), index=True)
+    member_id: Mapped[str] = mapped_column(ForeignKey("group_members.id", ondelete="CASCADE"))
+    provider_txn_id: Mapped[str] = mapped_column(String(64))
+    kind: Mapped[str] = mapped_column(String(16))  # expense|settlement
+    entity_id: Mapped[str | None] = mapped_column(String(36))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
+class ExperimentAssignment(Base):
+    """Randomized arm of a group in a controlled pilot experiment (group-level A/B test)."""
+
+    __tablename__ = "experiment_assignments"
+
+    group_id: Mapped[str] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"), primary_key=True)
+    experiment: Mapped[str] = mapped_column(String(40))
+    arm: Mapped[str] = mapped_column(String(16))  # control|treatment
+    assigned_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
+class ActivityDay(Base):
+    """One row per user per day they used a group (retention, without tracking what they looked at)."""
+
+    __tablename__ = "activity_days"
+    __table_args__ = (UniqueConstraint("user_id", "group_id", "day", name="uq_activity_day"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    group_id: Mapped[str] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"), index=True)
+    day: Mapped[date] = mapped_column(Date)
+
+
+class AuditLog(Base):
+    """Security-relevant events (who did what, from where, with what outcome). Never stores passwords,
+    tokens or full emails; failed logins keep only a hash of the email for lockout."""
+
+    __tablename__ = "audit_log"
+    __table_args__ = (Index("ix_audit_action_time", "action", "created_at"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, index=True)
+    user_id: Mapped[str | None] = mapped_column(String(36), index=True)
+    group_id: Mapped[str | None] = mapped_column(String(36))
+    action: Mapped[str] = mapped_column(String(40))
+    outcome: Mapped[str] = mapped_column(String(16), default="ok")  # ok|denied|failed
+    ip_hash: Mapped[str | None] = mapped_column(String(16))
+    subject_hash: Mapped[str | None] = mapped_column(String(16), index=True)  # e.g. hashed email for failed logins
+    detail: Mapped[dict | None] = mapped_column(JSON)
+
+
+class RevokedToken(Base):
+    """Signed-out session tokens (checked on every request until they would have expired anyway)."""
+
+    __tablename__ = "revoked_tokens"
+
+    jti: Mapped[str] = mapped_column(String(36), primary_key=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
+
+
+class SessionEpoch(Base):
+    """'Sign out everywhere': tokens issued before `not_before` are rejected."""
+
+    __tablename__ = "session_epochs"
+
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    not_before: Mapped[datetime] = mapped_column(DateTime)
+
+
+class RateLimitEvent(Base):
+    """Shared rate-limit counter so limits hold across several API instances (RATE_LIMIT_BACKEND=db)."""
+
+    __tablename__ = "rate_limit_events"
+    __table_args__ = (Index("ix_rate_key_time", "key", "at"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    key: Mapped[str] = mapped_column(String(80))
+    at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+
+
+class OutboxEvent(Base):
+    """Transactional outbox: domain events written in the same transaction as the change they describe,
+    then relayed to other systems (a wallet partner, analytics) by scripts/outbox_relay.py."""
+
+    __tablename__ = "outbox_events"
+    __table_args__ = (Index("ix_outbox_unpublished", "published_at", "created_at"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    topic: Mapped[str] = mapped_column(String(40))
+    group_id: Mapped[str | None] = mapped_column(String(36), index=True)
+    aggregate_id: Mapped[str | None] = mapped_column(String(36))
+    payload: Mapped[dict] = mapped_column(JSON)
+    published_at: Mapped[datetime | None] = mapped_column(DateTime)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class GroupSetting(Base):
+    """Per-group privacy choices. Group dynamics (who pays first, who settles late) is the most sensitive
+    analysis, so any member can see this setting and the group can switch it off."""
+
+    __tablename__ = "group_settings"
+
+    group_id: Mapped[str] = mapped_column(ForeignKey("groups.id", ondelete="CASCADE"), primary_key=True)
+    dynamics_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
+    updated_by_user_id: Mapped[str | None] = mapped_column(String(36))
+
+
 class Notification(Base):
     __tablename__ = "notifications"
     __table_args__ = (UniqueConstraint("user_id", "dedupe_key", name="uq_notification_dedupe"),)

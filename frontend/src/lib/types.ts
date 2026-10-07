@@ -27,6 +27,8 @@ export interface GroupSummary {
   flagged_count: number;
   last_activity: string | null;
   members: { id: string; name: string; color: string }[];
+  /** Pilot experiment arm: "control" groups get the ledger without the AI layer */
+  experiment_arm: "control" | "treatment";
 }
 
 export interface Member {
@@ -344,6 +346,7 @@ export interface Dashboard {
   recent_expenses: Expense[];
   llm: { available: boolean; model: string; reason: string | null };
   as_of: string;
+  experiment_arm: "control" | "treatment";
 }
 
 export interface WhatIfResult {
@@ -407,4 +410,59 @@ export interface TaxonomyCategory {
   category: string;
   color: string;
   subcategories: { key: string; label: string; expense_type: string; discretionary: boolean }[];
+}
+
+// ---------------------------------------------------------------------------- mobile wallet (MFS)
+export interface PaymentRequestInfo {
+  id: string;
+  reference: string;
+  purpose: "settlement" | "goal_contribution";
+  status: "pending" | "paid" | "failed" | "cancelled" | "expired";
+  amount: Paisa;
+  group_id: string;
+  group_name: string | null;
+  payer_member_id: string;
+  payer_name: string | null;
+  payee_member_id: string | null;
+  payee_name: string | null;
+  goal_id: string | null;
+  goal_title: string | null;
+  provider: string;
+  is_sandbox: boolean;
+  provider_txn_id: string | null;
+  result_id: string | null;
+  created_at: string;
+  expires_at: string;
+  completed_at: string | null;
+  can_approve: boolean;
+  approve_as: "payer" | "simulate_friend" | null;
+  is_request: boolean;
+  checkout_url: string;
+}
+
+export interface StatementItem {
+  txn_id: string;
+  line: number;
+  occurred_at: string;
+  kind: string;
+  kind_label: string;
+  direction: "in" | "out";
+  counterparty: string;
+  description: string;
+  amount: Paisa;
+  suggestion: "expense" | "settlement" | "skip";
+  reason: string;
+  category: string | null;
+  subcategory: string | null;
+  subcategory_label: string | null;
+  confidence: number | null;
+  to_member_id: string | null;
+  to_member_name: string | null;
+  already_imported: boolean;
+}
+
+export interface StatementPreview {
+  items: StatementItem[];
+  summary: { rows: number; expenses: number; settlements: number; skipped: number; already_imported: number; total_out: Paisa };
+  method: string;
 }

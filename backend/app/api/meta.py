@@ -15,6 +15,7 @@ from ..ml.taxonomy import taxonomy_payload
 
 router = APIRouter(tags=["meta"])
 EVAL_PATH = Path(__file__).resolve().parent.parent / "ml" / "evaluation.json"
+VALIDATION_PATH = Path(__file__).resolve().parent.parent / "ml" / "validation.json"
 
 
 @router.get("/health")
@@ -43,8 +44,12 @@ def taxonomy() -> list[dict]:
 @router.get("/meta/models")
 def models() -> dict:
     evaluation = json.loads(EVAL_PATH.read_text(encoding="utf-8")) if EVAL_PATH.exists() else None
+    validation = json.loads(VALIDATION_PATH.read_text(encoding="utf-8")) if VALIDATION_PATH.exists() else None
+    if validation:  # the page needs the comparisons, not the individual error examples
+        validation["categorizer"].get("stress_set", {}).pop("errors", None)
     return {
         "evaluation": evaluation,
+        "validation": validation,
         "models": [
             {"key": "categorizer", "name": "Smart expense categorization", "type": "ML classifier",
              "version": categorizer.MODEL_VERSION,

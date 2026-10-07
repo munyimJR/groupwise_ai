@@ -1,12 +1,12 @@
 "use client";
 
-import { Banknote, Check, CreditCard, Landmark, Loader2, Sparkles, Smartphone, Wand2 } from "lucide-react";
+import { Banknote, Check, CreditCard, Landmark, Loader2, Smartphone, Sparkles, Wallet, Wand2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ProvenanceBadge } from "@/components/ai/labels";
-import { Card, CardHeading, ErrorState, LoadingBlock, MemberAvatar, PageHeader } from "@/components/common/primitives";
+import { Card, CardHeading, ErrorState, LinkButton, LoadingBlock, MemberAvatar, PageHeader } from "@/components/common/primitives";
 import { AnomalyPanel } from "@/components/expenses/anomaly-panel";
 import { CategorySelect } from "@/components/expenses/category-select";
 import { CategoryIcon } from "@/components/expenses/expense-row";
@@ -185,7 +185,16 @@ export default function AddExpensePage() {
 
   return (
     <div>
-      <PageHeader eyebrow={group.name} title="Add an expense" subtitle="Describe it naturally — GroupWise reads the amount, merchant and category for you. You can always change it." />
+      <PageHeader
+        eyebrow={group.name}
+        title="Add an expense"
+        subtitle="Describe it naturally — GroupWise reads the amount, merchant and category for you. You can always change it."
+        actions={
+          <LinkButton href={`/g/${groupId}/import`} variant="outline">
+            <Wallet className="size-4" aria-hidden /> Import from wallet
+          </LinkButton>
+        }
+      />
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <form onSubmit={submit} className="space-y-5" noValidate>
           <Card className="space-y-4">

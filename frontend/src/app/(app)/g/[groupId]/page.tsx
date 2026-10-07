@@ -25,6 +25,8 @@ export default function DashboardPage() {
   if (error || !data) return <ErrorState error={error} onRetry={() => refetch()} />;
 
   const fc = data.forecast;
+  // Control arm of the pilot experiment: same ledger and goals, without the AI layer.
+  const ai = data.experiment_arm !== "control";
   const hasExpenses = data.spending.count > 0 || data.recent_expenses.length > 0;
 
   return (
@@ -67,6 +69,24 @@ export default function DashboardPage() {
                 </span>
               }
             />
+            <div className="card-surface flex min-w-[78%] snap-start items-center gap-4 p-4 sm:min-w-0">
+              {data.health.status === "ok" && data.health.score !== undefined ? (
+                <>
+                  <HealthRing score={data.health.score} />
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+                      <HeartPulse className="size-3.5 text-brand-blue" aria-hidden /> Financial health
+                    </p>
+                    <p className="text-lg font-extrabold capitalize text-ink">{data.health.band}</p>
+                    <p className="text-xs text-ink-muted">Prototype indicator</p>
+                    <HealthExplainer health={data.health} />
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-ink-muted">{data.health.message ?? "More history is needed for a health indicator."}</p>
+              )}
+            </div>
+            {ai && (
             <div className="card-surface flex min-w-[78%] snap-start flex-col gap-1.5 p-4 sm:min-w-0">
                 <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
                 <CalendarClock className="size-3.5 text-brand-blue" aria-hidden /> Next 7 days
@@ -89,12 +109,14 @@ export default function DashboardPage() {
                 <p className="text-sm text-ink-muted">{fc.message}</p>
               )}
             </div>
+            )}
           </div>
 
           <div className="grid gap-5 xl:grid-cols-12">
             <div className="space-y-5 xl:col-span-8">
               {data.recommendation && <RecommendationCard rec={data.recommendation} groupId={groupId} compact />}
 
+              {ai && (
               <Card>
                 <CardHeading
                   icon={Lightbulb}
@@ -116,6 +138,7 @@ export default function DashboardPage() {
                   <EmptyState title="No insights yet" body="More transaction history is needed to generate reliable insights." />
                 )}
               </Card>
+              )}
 
               <Card>
                 <CardHeading
@@ -146,6 +169,42 @@ export default function DashboardPage() {
                   <LinkButton href={`/g/${groupId}/goals`} variant="soft" className="mt-3">
                     Create a goal
                   </LinkButton>
+                </Card>
+              )}
+
+              {ai && data.dynamics.status === "ok" && (
+                <Card>
+                  <CardHeading
+                    icon={ArrowLeftRight}
+                    title="Group dynamics"
+                    subtitle="Who fronts the money — observable payments only"
+                    action={
+                      <Link href={`/g/${groupId}/dynamics`} className="tap-target text-sm font-semibold text-brand-blue hover:underline">
+                        Open
+                      </Link>
+                    }
+                  />
+                  {data.dynamics.insights[0] && (
+                    <p className="mb-3 rounded-xl bg-brand-blue-softer p-3 text-sm text-ink">{data.dynamics.insights[0].text}</p>
+                  )}
+                  <ul className="space-y-2">
+                    {data.dynamics.members.slice(0, 4).map((m) => (
+                      <li key={m.member_id} className="text-xs">
+                        <div className="flex justify-between font-medium text-ink">
+                          <span>
+                            {m.name}
+                            {m.is_you && <span className="text-ink-muted"> (you)</span>}
+                          </span>
+                          <span className="tabular">
+                            paid {m.paid_share_pct.toFixed(0)}% · used {m.consumed_share_pct.toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f1f4f8]">
+                          <div className="h-full rounded-full bg-brand-blue" style={{ width: `${Math.min(100, m.paid_share_pct)}%` }} />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 </Card>
               )}
 

@@ -1,7 +1,7 @@
 """Shared API helpers: group access control and serializers."""
 from __future__ import annotations
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -9,6 +9,8 @@ from ..auth.security import get_current_user
 from ..db import get_db
 from ..ml.taxonomy import get_subcategory
 from ..models import Expense, Group, GroupMember, User
+from ..services.audit import probes
+from ..services.experiments import touch_activity
 
 
 def user_out(user: User) -> dict:
@@ -22,13 +24,18 @@ class GroupAccess:
         self.group, self.member, self.user = group, member, user
 
 
-def group_access(group_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> GroupAccess:
-    """The caller must be an active member. Non-members get 404 so group ids can't be probed."""
+def group_access(group_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db),
+                 request: Request = None) -> GroupAccess:
+    """The caller must be an active member. Non-members get 404 so group ids can't be probed, and a caller
+    who keeps hitting groups they don't belong to is blocked for a while (see ProbeDetector)."""
+    probes.check(user.id)
     group = db.get(Group, group_id)
     member = db.scalar(select(GroupMember).where(GroupMember.group_id == group_id, GroupMember.user_id == user.id,
                                                  GroupMember.status == "active")) if group else None
     if group is None or member is None:
+        probes.miss(db, request, user.id, group_id)
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Group not found.")
+    touch_activity(db, user, group_id)  # retention metric for the pilot (real accounts only)
     return GroupAccess(group, member, user)
 
 
