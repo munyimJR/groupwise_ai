@@ -40,3 +40,7 @@ Frontend lint, production build and TypeScript checks pass. The local dashboard 
 ## Minimalism pass
 
 The follow-up visual pass keeps the same brand but removes visual weight across the whole site: smaller radii, almost-flat cards, quieter shadows, lighter surfaces, simpler heading icons, calmer navigation states, and a plain auth panel. The landing hero keeps the existing product story and component preview but removes the decorative yellow glow. This preserves the product's recognizable identity while making dense financial screens easier to scan.
+
+## Landing hero refinement
+
+The landing hero now leads with one direct promise — “Shared money, made clear.” — followed by a short description and a compact three-step routine: record, understand and decide. The previous five-step copy stack and yellow underline were removed so the text side reads quickly at a glance while the adjacent panel reinforces user control.

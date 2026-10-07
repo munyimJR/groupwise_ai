@@ -6,14 +6,12 @@ import {
   BadgeCheck,
   Bot,
   CalendarClock,
-  Database,
   Eye,
   FlaskConical,
   Lock,
   Receipt,
   Scale,
   ShieldCheck,
-  Sparkles,
   Tags,
   Target,
   TrendingUp,
@@ -26,11 +24,9 @@ import { LinkButton } from "@/components/common/primitives";
 import { useAuth } from "@/lib/auth";
 
 const PIPELINE = [
-  { icon: Receipt, title: "Transactions", body: "Shared expenses, splits and settlements — exact to the paisa." },
-  { icon: Database, title: "Financial intelligence", body: "Patterns and spending drivers computed from your group's own data." },
-  { icon: TrendingUp, title: "Prediction", body: "Cash-flow forecast, unusual-expense detection, goal likelihood." },
-  { icon: Sparkles, title: "Recommendation", body: "Explainable suggestions with a simulated outcome." },
-  { icon: BadgeCheck, title: "Your decision", body: "AI recommends. Your group stays in control." },
+  { icon: Receipt, title: "Record", body: "Exact shared expenses, splits and settlements." },
+  { icon: TrendingUp, title: "Understand", body: "Patterns, unusual entries and what may come next." },
+  { icon: BadgeCheck, title: "Decide", body: "Goals, scenarios and clear next steps for your group." },
 ];
 
 const QUESTIONS = [
@@ -90,21 +86,14 @@ export default function LandingPage() {
 
       <main id="main" tabIndex={-1} className="outline-none">
         <section className="relative overflow-hidden border-b border-line bg-white">
-          <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
-            <div>
-              <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-brand-blue-soft px-3 py-1 text-xs font-bold text-brand-blue-deep">
-                <Sparkles className="size-3.5" aria-hidden /> Shared financial intelligence for groups
-              </p>
-              <h1 className="text-[38px] font-extrabold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-[56px]">
-                Split expenses. <span className="text-brand-blue">Understand spending.</span> Predict what&apos;s next.{" "}
-                <span className="relative whitespace-nowrap">
-                  <span className="relative z-10">Decide better together.</span>
-                  <span className="absolute inset-x-0 bottom-1 -z-0 h-3 rounded bg-brand-yellow sm:bottom-2" aria-hidden />
-                </span>
+          <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:py-24">
+            <div className="max-w-xl">
+              <p className="mb-5 text-xs font-bold uppercase tracking-[0.16em] text-brand-blue">Shared finance for groups</p>
+              <h1 className="max-w-[13ch] text-[52px] font-extrabold leading-[0.98] tracking-[-0.04em] text-ink sm:text-[64px] lg:text-[68px]">
+                Shared money, <span className="text-brand-blue">made clear.</span>
               </h1>
-              <p className="mt-5 max-w-xl text-base text-ink-muted sm:text-lg">
-                GroupWise AI helps roommates, friends and travel groups understand where shared money goes, see financial pressure coming,
-                catch unusual expenses and plan goals — with AI that explains itself.
+              <p className="mt-6 max-w-lg text-base leading-7 text-ink-muted sm:text-lg">
+                Track expenses, settle balances, and plan shared goals with explainable insight.
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 {status === "authenticated" ? (
@@ -120,27 +109,35 @@ export default function LandingPage() {
                   </>
                 )}
               </div>
-              <p className="mt-3 text-xs text-ink-muted">One click, no sign-up: a private sandbox with three synthetic groups. Synthetic data only.</p>
+              <p className="mt-3 text-xs text-ink-muted">Private sandbox · Three synthetic groups · No sign-up required</p>
             </div>
 
-            <div className="card-surface relative p-5 sm:p-6" aria-label="How GroupWise turns transactions into decisions">
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.12em] text-ink-muted">From transactions to decisions</p>
-              <ol className="space-y-3">
-                {PIPELINE.map((step, i) => (
-                  <li key={step.title} className="flex items-start gap-3">
-                  <span className={i === PIPELINE.length - 1 ? "grid size-9 shrink-0 place-items-center rounded-lg bg-brand-yellow text-ink" : "grid size-9 shrink-0 place-items-center rounded-lg bg-surface text-brand-blue"}>
+            <div className="card-surface p-5 sm:p-7" aria-label="How GroupWise turns transactions into decisions">
+              <div className="flex items-end justify-between gap-4 border-b border-line pb-4">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-blue">One clear routine</p>
+                  <p className="mt-1 text-lg font-bold text-ink">From shared spending to a shared plan.</p>
+                </div>
+                <span className="hidden size-10 shrink-0 place-items-center rounded-xl bg-brand-yellow text-ink sm:grid" aria-hidden>
+                  <BadgeCheck className="size-5" />
+                </span>
+              </div>
+              <div className="divide-y divide-line">
+                {PIPELINE.map((step) => (
+                  <div key={step.title} className="flex items-start gap-3 py-4 first:pt-5 last:pb-1">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-surface text-brand-blue">
                       <step.icon className="size-5" aria-hidden />
                     </span>
                     <div>
-                      <p className="text-sm font-bold text-ink">
-                        <span className="mr-1.5 text-ink-muted">{i + 1}.</span>
-                        {step.title}
-                      </p>
-                      <p className="text-[13px] text-ink-muted">{step.body}</p>
+                      <p className="text-sm font-bold text-ink">{step.title}</p>
+                      <p className="mt-0.5 text-[13px] leading-5 text-ink-muted">{step.body}</p>
                     </div>
-                  </li>
+                  </div>
                 ))}
-              </ol>
+              </div>
+              <p className="mt-4 border-t border-line pt-4 text-sm text-ink-muted">
+                <span className="font-semibold text-ink">People stay in control.</span> GroupWise explains the numbers and shows the assumptions.
+              </p>
             </div>
           </div>
         </section>
