@@ -206,27 +206,30 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="bg-brand-blue-deep text-white">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-5 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h2 className="text-2xl font-extrabold text-white sm:text-3xl">See it with a real group&apos;s worth of data.</h2>
-              <p className="mt-1 text-white/75">Three synthetic groups — classmates, roommates and a finished trip — ready to explore.</p>
+        <section className="border-t border-line bg-surface">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+            <div className="grid gap-7 rounded-2xl border border-brand-blue/15 bg-brand-blue-soft/40 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div className="max-w-2xl">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-blue">Try the workspace</p>
+                <h2 className="mt-2 text-2xl font-extrabold leading-tight text-ink sm:text-3xl">See how your group money fits together.</h2>
+                <p className="mt-2 text-sm leading-6 text-ink-muted">Explore three synthetic groups with shared expenses, balances and goals ready to review.</p>
+              </div>
+              {status === "authenticated" ? (
+                <LinkButton href="/groups" size="lg">
+                  Open my dashboard <ArrowRight className="size-4" aria-hidden />
+                </LinkButton>
+              ) : (
+                <DemoButton />
+              )}
             </div>
-            {status === "authenticated" ? (
-              <LinkButton href="/groups" size="lg">
-                Open my dashboard
-              </LinkButton>
-            ) : (
-              <DemoButton />
-            )}
           </div>
         </section>
       </main>
 
       <footer className="border-t border-line bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-xs text-ink-muted sm:px-6 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-9 sm:px-6 md:flex-row md:items-end md:justify-between">
           <Logo className="scale-90" />
-          <p className="max-w-2xl">
+          <p className="max-w-2xl text-[11px] leading-5 text-ink-muted">
             GroupWise AI is an independent hackathon prototype for digital financial services. It is not affiliated with or endorsed by upay or
             any financial institution. All demo data is synthetic. Not financial advice.
           </p>
