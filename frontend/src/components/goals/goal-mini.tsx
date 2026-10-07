@@ -59,12 +59,18 @@ export function GoalMiniCard({ goal, groupId }: { goal: GoalPlan; groupId: strin
         {Math.round(goal.projection.on_track_pct)}%<span className="ml-2 text-sm font-semibold text-ink-muted">projected on track</span>
       </p>
       <GoalBar goal={goal} />
-      <p className="mt-3 text-[13px] text-ink">{goal.explanation}</p>
-      <p className="mt-1 text-xs text-ink-muted">
-        Simulated likelihood of reaching it on time: <strong className="text-ink">{likelihood(goal.projection.likelihood_pct)}</strong>
-      </p>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <div className="rounded-lg bg-surface px-3 py-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">Current pace</p>
+          <p className="mt-0.5 text-sm font-bold text-ink">{taka(goal.projection.rate_monthly)}<span className="text-xs font-medium text-ink-muted">/mo</span></p>
+        </div>
+        <div className="rounded-lg bg-surface px-3 py-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">On-time chance</p>
+          <p className="mt-0.5 text-sm font-bold text-ink">{likelihood(goal.projection.likelihood_pct)}</p>
+        </div>
+      </div>
       <Link href={`/g/${groupId}/goals/${goal.goal_id}`} className="tap-target mt-3 inline-block text-sm font-semibold text-brand-blue hover:underline">
-        Open goal planner →
+        Open planner →
       </Link>
     </Card>
   );

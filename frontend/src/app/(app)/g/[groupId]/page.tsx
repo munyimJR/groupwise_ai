@@ -32,7 +32,7 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow={`${TYPE_LABEL[data.group.group_type] ?? "Group"} · ${data.group.member_count} member${data.group.member_count === 1 ? "" : "s"}`}
         title={data.group.name}
-        subtitle="Track shared spending, settle balances, and keep your next goal on course."
+        subtitle="Shared money at a glance."
       />
 
       {!hasExpenses ? (
@@ -44,19 +44,19 @@ export default function DashboardPage() {
         />
       ) : (
         <>
-          <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 xl:grid-cols-3">
+          <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
             <StatTile
               className="min-w-[78%] snap-start sm:min-w-0"
               accent
               icon={Wallet}
-              label={`Total spending · last ${data.spending.period_days} days`}
+              label={`Spending · ${data.spending.period_days} days`}
               value={<span className="text-[34px]">{taka(data.spending.total)}</span>}
-              sub={<Delta value={data.spending.change_pct} suffix={`vs previous ${data.spending.period_days} days`} />}
+              sub={<Delta value={data.spending.change_pct} suffix="vs prior period" />}
             />
             <StatTile
               className="min-w-[78%] snap-start sm:min-w-0"
               icon={ArrowLeftRight}
-              label="Your net balance"
+              label="Your balance"
               value={taka(Math.abs(data.me.net), { decimals: true })}
               sub={
                 <span className="flex flex-wrap items-center gap-2">
@@ -68,14 +68,14 @@ export default function DashboardPage() {
               }
             />
             <div className="card-surface flex min-w-[78%] snap-start flex-col gap-1.5 p-4 sm:min-w-0">
-              <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
-                <CalendarClock className="size-3.5 text-brand-blue" aria-hidden /> Next 7 days · projected
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
+                <CalendarClock className="size-3.5 text-brand-blue" aria-hidden /> Next 7 days
               </p>
               {fc.status === "ok" ? (
                 <>
                   <p className="text-[26px] font-extrabold leading-none text-ink">≈ {taka(fc.total)}</p>
                   <p className="text-xs text-ink-muted">
-                    Likely {taka(fc.interval!.low)}–{taka(fc.interval!.high)}
+                    Projected range {taka(fc.interval!.low)}–{taka(fc.interval!.high)}
                     {fc.pressure_days?.length ? ` · peak ${fc.pressure_days.map((p) => p.dow).join(", ")}` : ""}
                   </p>
                   <div className="flex items-center justify-between gap-2">
@@ -93,13 +93,13 @@ export default function DashboardPage() {
 
           <div className="grid gap-5 xl:grid-cols-12">
             <div className="space-y-5 xl:col-span-8">
-              {data.recommendation && <RecommendationCard rec={data.recommendation} groupId={groupId} />}
+              {data.recommendation && <RecommendationCard rec={data.recommendation} groupId={groupId} compact />}
 
               <Card>
                 <CardHeading
                   icon={Lightbulb}
                   title="AI insights"
-                  subtitle="Every number below is computed from your group's own transactions."
+                  subtitle="Trends, anomalies, and forecasts."
                   action={
                     <Link href={`/g/${groupId}/insights`} className="tap-target inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-brand-blue hover:underline">
                       All insights <ArrowRight className="size-3.5" aria-hidden />
@@ -179,8 +179,8 @@ function DashboardSkeleton() {
   return (
     <div className="space-y-5" aria-busy="true" aria-label="Loading dashboard">
       <Skeleton className="h-10 w-64 rounded-xl bg-line/60" />
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
           <Skeleton key={i} className="h-32 rounded-2xl bg-line/60" />
         ))}
       </div>

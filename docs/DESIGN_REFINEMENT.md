@@ -50,3 +50,7 @@ The closing call-to-action now uses a contained light-blue panel with a shorter 
 ## Motion restraint
 
 Framer Motion is limited to a shared `HoverLift` used on primary actions and clickable cards. The lift is a small spring-based rise with a restrained press scale, while the app-wide `MotionConfig` respects the user's reduced-motion preference. No page transitions or decorative looping motion were added.
+
+## Dashboard simplification
+
+The group dashboard keeps the same measurements but presents them as shorter labels and compact summaries: spending, balance and seven-day projection sit in one scan row; recommendations expose assumptions on demand; insight observations preview at two lines; and goal cards show current pace and on-time chance as distinct metrics.

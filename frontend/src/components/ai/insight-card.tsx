@@ -40,8 +40,8 @@ export function InsightCard({ insight, defaultOpen = false, compact = false }: {
           <span className="sr-only">{sev.word}</span>
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="text-[15px] font-bold leading-snug text-ink">{insight.title}</h3>
-          <p className="mt-1 text-sm text-ink-muted">{insight.observation}</p>
+          <h3 className={cn("text-[15px] font-bold leading-snug text-ink", compact && "line-clamp-2")}>{insight.title}</h3>
+          <p className={cn("mt-1 text-sm text-ink-muted", compact && "line-clamp-2 text-[13px] leading-5")}>{insight.observation}</p>
           {!compact && insight.inference && (
             <p className="mt-2 text-sm font-medium text-ink">
               <span className="sr-only">Inference: </span>
