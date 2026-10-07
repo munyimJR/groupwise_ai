@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Logo, LogoMark } from "@/components/brand/logo";
 import { MemberAvatar } from "@/components/common/primitives";
@@ -318,23 +318,6 @@ function BottomNav({ groupId }: { groupId: string | null }) {
   );
 }
 
-function DemoBanner() {
-  const { user } = useAuth();
-  const resets = useMemo(
-    () =>
-      user?.expires_at
-        ? new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(new Date(user.expires_at))
-        : null,
-    [user],
-  );
-  if (!user?.is_demo) return null;
-  return (
-    <div className="border-b border-brand-yellow-strong/40 bg-brand-yellow-soft px-4 py-1.5 text-center text-xs text-ink">
-      <strong>Demo sandbox</strong> — synthetic data only, private to you{resets ? `, resets ${resets}` : ""}. Add expenses freely.
-    </div>
-  );
-}
-
 export function AppShell({ children }: { children: React.ReactNode }) {
   const groupId = useCurrentGroupId();
   return (
@@ -349,7 +332,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="fixed inset-x-0 top-0 z-40 h-[env(safe-area-inset-top)] bg-white" aria-hidden />
       <Sidebar groupId={groupId} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <DemoBanner />
         <header className="sticky top-[env(safe-area-inset-top)] z-30 border-b border-line bg-white">
           <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-3 px-4 sm:px-6">
             <Link href={groupId ? `/g/${groupId}` : "/groups"} className="tap-target lg:hidden" aria-label="GroupWise AI home">
