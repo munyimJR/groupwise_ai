@@ -36,15 +36,15 @@
   /* Brand palette */
   --color-brand-yellow: #ffd429;
   --color-brand-yellow-strong: #f5c400;
-  --color-brand-yellow-soft: #fff7d1;
+  --color-brand-yellow-soft: #fff9df;
   --color-brand-blue: #0057b8;
   --color-brand-blue-deep: #003b7a;
   --color-brand-blue-soft: #e9f1fb;
-  --color-brand-blue-softer: #f3f7fd;
+  --color-brand-blue-softer: #f7faff;
   --color-ink: #162033;
   --color-ink-muted: #5d6678; /* ≥5:1 on every surface incl. tinted chips */
-  --color-surface: #f6f8fb;
-  --color-line: #e6eaf0;
+  --color-surface: #f8fafc;
+  --color-line: #e7ebf0;
 
   /* Restrained semantic colours (always paired with an icon or text) */
   --color-good: #0f7a55;
@@ -62,13 +62,13 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  --shadow-card: 0 1px 2px rgb(22 32 51 / 0.04), 0 4px 16px -6px rgb(22 32 51 / 0.08);
-  --shadow-lift: 0 2px 4px rgb(22 32 51 / 0.05), 0 12px 32px -12px rgb(0 59 122 / 0.22);
+  --shadow-card: 0 1px 2px rgb(22 32 51 / 0.03);
+  --shadow-lift: 0 8px 24px -14px rgb(0 59 122 / 0.24);
 }
 
 :root {
   color-scheme: light;
-  --background: #f6f8fb;
+  --background: #f8fafc;
   --foreground: #162033;
   --card: #ffffff;
   --card-foreground: #162033;
@@ -78,7 +78,7 @@
   --primary-foreground: #162033;
   --secondary: #eef2f7;
   --secondary-foreground: #162033;
-  --muted: #eef2f7;
+  --muted: #f1f4f8;
   --muted-foreground: #5d6678;
   --accent: #e9f1fb;
   --accent-foreground: #003b7a;
@@ -86,7 +86,7 @@
   --border: #e6eaf0;
   --input: #8a94a6; /* form-field boundary ≥3:1 (WCAG 1.4.11) */
   --ring: #0057b8;
-  --radius: 0.75rem;
+  --radius: 0.625rem;
 }
 
 @layer base {
@@ -150,7 +150,7 @@
 @utility card-surface {
   background: #ffffff;
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-2xl);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
 }
 

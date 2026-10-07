@@ -31,11 +31,10 @@ export function RecommendationCard({ rec, groupId, variant = "hero" }: { rec: Re
   if (state === "dismissed") return null;
   const hero = variant === "hero";
   return (
-    <article className={cn("relative overflow-hidden rounded-2xl border p-4 sm:p-5", hero ? "border-brand-yellow-strong/50 bg-brand-yellow-soft" : "border-line bg-white")}>
-      {hero && <div className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-brand-yellow/40" aria-hidden />}
+    <article className={cn("relative overflow-hidden rounded-xl border bg-white p-4 sm:p-5", hero ? "border-brand-yellow-strong/60" : "border-line")}>
       <div className="relative flex items-start gap-3">
-        <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl", hero ? "bg-brand-yellow text-brand-blue-deep" : "bg-brand-yellow-soft text-[#7a5b00]")}>
-          <Lightbulb className="size-[18px]" aria-hidden />
+        <span className={cn("mt-0.5 shrink-0", hero ? "text-[#7a5b00]" : "text-ink-muted")}>
+          <Lightbulb className="size-[17px]" aria-hidden />
         </span>
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex flex-wrap items-center gap-2">
@@ -45,7 +44,7 @@ export function RecommendationCard({ rec, groupId, variant = "hero" }: { rec: Re
           <h3 className="text-[15px] font-bold leading-snug text-ink">{rec.title}</h3>
           <p className="mt-1 text-sm text-ink">{rec.text}</p>
           {rec.expected_outcome && (
-            <p className="mt-2 rounded-lg bg-white/70 px-3 py-2 text-[13px] text-ink">
+            <p className="mt-2 rounded-lg bg-surface px-3 py-2 text-[13px] text-ink">
               <span className="font-semibold text-brand-blue-deep">Simulated outcome: </span>
               {rec.expected_outcome}
             </p>

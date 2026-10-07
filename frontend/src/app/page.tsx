@@ -17,7 +17,6 @@ import {
   Tags,
   Target,
   TrendingUp,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -28,7 +27,7 @@ import { useAuth } from "@/lib/auth";
 
 const PIPELINE = [
   { icon: Receipt, title: "Transactions", body: "Shared expenses, splits and settlements — exact to the paisa." },
-  { icon: Database, title: "Financial intelligence", body: "Patterns, drivers and group dynamics computed from your data." },
+  { icon: Database, title: "Financial intelligence", body: "Patterns and spending drivers computed from your group's own data." },
   { icon: TrendingUp, title: "Prediction", body: "Cash-flow forecast, unusual-expense detection, goal likelihood." },
   { icon: Sparkles, title: "Recommendation", body: "Explainable suggestions with a simulated outcome." },
   { icon: BadgeCheck, title: "Your decision", body: "AI recommends. Your group stays in control." },
@@ -41,7 +40,6 @@ const QUESTIONS = [
   "What looks unusual?",
   "Can we reach our trip goal?",
   "What should we change?",
-  "Who is carrying most of the upfront costs?",
 ];
 
 const FEATURES = [
@@ -50,7 +48,6 @@ const FEATURES = [
   { icon: CalendarClock, title: "Cash-flow forecast", method: "Seasonal model + recurring-bill detection", body: "Next 7–30 days of spending with an 80% range, the high-pressure days, and why." },
   { icon: Target, title: "Goal planner", method: "Projection + Monte-Carlo simulation", body: "Will the trip fund make it? See the projected gap, the likelihood, and what would close it." },
   { icon: FlaskConical, title: "What-If simulator", method: "Scenario engine on the forecast", body: "Cut dining 15%? Expenses up 20%? See savings, pressure and goal impact instantly." },
-  { icon: Users, title: "Group dynamics", method: "Behavioural analytics (observable payments only)", body: "Who fronts the money, how long reimbursements take, and a fairer payer rotation." },
   { icon: Bot, title: "Ask GroupWise", method: "Grounded LLM copilot", body: "Ask in plain English. Answers cite computed facts, and every figure is verified against your data." },
   { icon: Scale, title: "Settle up, simplified", method: "Deterministic algorithm — not AI", body: "Exact balances and the minimum set of payments to clear everyone." },
 ];
@@ -92,8 +89,7 @@ export default function LandingPage() {
       </header>
 
       <main id="main" tabIndex={-1} className="outline-none">
-        <section className="relative overflow-hidden border-b border-line bg-gradient-to-b from-white to-surface">
-          <div className="pointer-events-none absolute -right-24 -top-24 size-[420px] rounded-full bg-brand-yellow/30 blur-3xl" aria-hidden />
+        <section className="relative overflow-hidden border-b border-line bg-white">
           <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
             <div>
               <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-blue/15 bg-brand-blue-soft px-3 py-1 text-xs font-bold text-brand-blue-deep">
@@ -132,7 +128,7 @@ export default function LandingPage() {
               <ol className="space-y-3">
                 {PIPELINE.map((step, i) => (
                   <li key={step.title} className="flex items-start gap-3">
-                    <span className={i === PIPELINE.length - 1 ? "grid size-10 shrink-0 place-items-center rounded-xl bg-brand-yellow text-ink" : "grid size-10 shrink-0 place-items-center rounded-xl bg-brand-blue-soft text-brand-blue"}>
+                  <span className={i === PIPELINE.length - 1 ? "grid size-9 shrink-0 place-items-center rounded-lg bg-brand-yellow text-ink" : "grid size-9 shrink-0 place-items-center rounded-lg bg-surface text-brand-blue"}>
                       <step.icon className="size-5" aria-hidden />
                     </span>
                     <div>
@@ -177,7 +173,7 @@ export default function LandingPage() {
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {FEATURES.map((f) => (
                 <article key={f.title} className="card-surface flex flex-col p-5">
-                  <span className="grid size-10 place-items-center rounded-xl bg-brand-blue-soft text-brand-blue">
+                  <span className="grid size-9 place-items-center rounded-lg bg-surface text-brand-blue">
                     <f.icon className="size-5" aria-hidden />
                   </span>
                   <h3 className="mt-3 text-base font-bold text-ink">{f.title}</h3>

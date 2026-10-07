@@ -17,13 +17,11 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
         </div>
         <p className="text-center text-xs text-ink-muted">Hackathon prototype · synthetic data · not affiliated with any financial institution</p>
       </div>
-      <div className="relative hidden overflow-hidden bg-brand-blue-deep lg:block">
-        <div className="absolute -right-20 -top-20 size-96 rounded-full bg-brand-yellow/90" aria-hidden />
-        <div className="absolute -bottom-32 -left-16 size-96 rounded-full bg-brand-blue" aria-hidden />
-        <div className="relative flex h-full flex-col justify-end p-12 text-white">
-          <Sparkles className="mb-4 size-8 text-brand-yellow" aria-hidden />
-          <p className="max-w-md text-3xl font-extrabold leading-tight">“GroupWise doesn&apos;t just tell groups where their money went.”</p>
-          <p className="mt-3 max-w-md text-white/80">
+      <div className="relative hidden overflow-hidden border-l border-line bg-surface lg:block">
+        <div className="relative flex h-full flex-col justify-end p-12 text-ink">
+          <Sparkles className="mb-4 size-7 text-brand-blue" aria-hidden />
+          <p className="max-w-md text-3xl font-bold leading-tight">“GroupWise doesn&apos;t just tell groups where their money went.”</p>
+          <p className="mt-3 max-w-md text-ink-muted">
             It helps them understand what is happening, anticipate what comes next, and make better financial decisions together.
           </p>
         </div>

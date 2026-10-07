@@ -1,10 +1,9 @@
 "use client";
 
-import { ArrowLeftRight, ArrowRight, CalendarClock, HeartPulse, Lightbulb, Receipt, Target, TrendingUp, Wallet } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, CalendarClock, Lightbulb, Receipt, Target, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import { HealthExplainer, HealthRing } from "@/components/ai/health-ring";
 import { InsightCard } from "@/components/ai/insight-card";
 import { ConfidenceMeter, ProvenanceBadge } from "@/components/ai/labels";
 import { RecommendationCard } from "@/components/ai/recommendation-card";
@@ -33,7 +32,7 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow={`${TYPE_LABEL[data.group.group_type] ?? "Group"} · ${data.group.member_count} member${data.group.member_count === 1 ? "" : "s"}`}
         title={data.group.name}
-        subtitle="Your group's money at a glance — what happened, what's likely next, and what to do about it."
+        subtitle="Track shared spending, settle balances, and keep your next goal on course."
       />
 
       {!hasExpenses ? (
@@ -45,8 +44,7 @@ export default function DashboardPage() {
         />
       ) : (
         <>
-          {/* Hero tiles — swipeable on mobile */}
-          <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 xl:grid-cols-4">
+          <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 xl:grid-cols-3">
             <StatTile
               className="min-w-[78%] snap-start sm:min-w-0"
               accent
@@ -69,23 +67,6 @@ export default function DashboardPage() {
                 </span>
               }
             />
-            <div className="card-surface flex min-w-[78%] snap-start items-center gap-4 p-4 sm:min-w-0">
-              {data.health.status === "ok" && data.health.score !== undefined ? (
-                <>
-                  <HealthRing score={data.health.score} />
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
-                      <HeartPulse className="size-3.5 text-brand-blue" aria-hidden /> Financial health
-                    </p>
-                    <p className="text-lg font-extrabold capitalize text-ink">{data.health.band}</p>
-                    <p className="text-xs text-ink-muted">Prototype indicator</p>
-                    <HealthExplainer health={data.health} />
-                  </div>
-                </>
-              ) : (
-                <p className="text-sm text-ink-muted">{data.health.message ?? "More history is needed for a health indicator."}</p>
-              )}
-            </div>
             <div className="card-surface flex min-w-[78%] snap-start flex-col gap-1.5 p-4 sm:min-w-0">
               <p className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
                 <CalendarClock className="size-3.5 text-brand-blue" aria-hidden /> Next 7 days · projected
@@ -165,42 +146,6 @@ export default function DashboardPage() {
                   <LinkButton href={`/g/${groupId}/goals`} variant="soft" className="mt-3">
                     Create a goal
                   </LinkButton>
-                </Card>
-              )}
-
-              {data.dynamics.status === "ok" && (
-                <Card>
-                  <CardHeading
-                    icon={ArrowLeftRight}
-                    title="Group dynamics"
-                    subtitle="Who fronts the money — observable payments only"
-                    action={
-                      <Link href={`/g/${groupId}/dynamics`} className="tap-target text-sm font-semibold text-brand-blue hover:underline">
-                        Open
-                      </Link>
-                    }
-                  />
-                  {data.dynamics.insights[0] && (
-                    <p className="mb-3 rounded-xl bg-brand-blue-softer p-3 text-sm text-ink">{data.dynamics.insights[0].text}</p>
-                  )}
-                  <ul className="space-y-2">
-                    {data.dynamics.members.slice(0, 4).map((m) => (
-                      <li key={m.member_id} className="text-xs">
-                        <div className="flex justify-between font-medium text-ink">
-                          <span>
-                            {m.name}
-                            {m.is_you && <span className="text-ink-muted"> (you)</span>}
-                          </span>
-                          <span className="tabular">
-                            paid {m.paid_share_pct.toFixed(0)}% · used {m.consumed_share_pct.toFixed(0)}%
-                          </span>
-                        </div>
-                        <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#f1f4f8]">
-                          <div className="h-full rounded-full bg-brand-blue" style={{ width: `${Math.min(100, m.paid_share_pct)}%` }} />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
                 </Card>
               )}
 

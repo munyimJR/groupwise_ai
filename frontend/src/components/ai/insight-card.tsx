@@ -19,10 +19,10 @@ const KIND_ICON = {
 } as const;
 
 const SEVERITY = {
-  alert: { ring: "border-l-bad", icon: "bg-bad-soft text-bad", word: "Needs review" },
-  warning: { ring: "border-l-warn", icon: "bg-warn-soft text-warn", word: "Heads-up" },
-  info: { ring: "border-l-brand-blue", icon: "bg-brand-blue-soft text-brand-blue", word: "Info" },
-  positive: { ring: "border-l-good", icon: "bg-good-soft text-good", word: "Going well" },
+  alert: { ring: "border-bad", icon: "bg-bad-soft text-bad", word: "Needs review" },
+  warning: { ring: "border-warn", icon: "bg-warn-soft text-warn", word: "Heads-up" },
+  info: { ring: "border-brand-blue", icon: "bg-brand-blue-soft text-brand-blue", word: "Info" },
+  positive: { ring: "border-good", icon: "bg-good-soft text-good", word: "Going well" },
 } as const;
 
 export function InsightCard({ insight, defaultOpen = false, compact = false }: { insight: Insight; defaultOpen?: boolean; compact?: boolean }) {
@@ -33,10 +33,10 @@ export function InsightCard({ insight, defaultOpen = false, compact = false }: {
   const hasDetail = insight.why.length > 0 || !!insight.inference;
 
   return (
-    <article className={cn("rounded-2xl border border-line border-l-4 bg-white p-4 transition-shadow hover:shadow-[var(--shadow-card)]", sev.ring)}>
+    <article className={cn("rounded-xl border border-line bg-white p-4 transition-colors hover:border-brand-blue/25", sev.ring)}>
       <div className="flex items-start gap-3">
-        <span className={cn("grid size-9 shrink-0 place-items-center rounded-xl", sev.icon)}>
-          <Icon className="size-[18px]" aria-hidden />
+        <span className={cn("mt-0.5 shrink-0", sev.icon.replace(/bg-[^ ]+\s?/, ""))}>
+          <Icon className="size-[17px]" aria-hidden />
           <span className="sr-only">{sev.word}</span>
         </span>
         <div className="min-w-0 flex-1">
@@ -62,7 +62,7 @@ export function InsightCard({ insight, defaultOpen = false, compact = false }: {
             Why? <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} aria-hidden />
           </button>
           {open && (
-            <div className="mt-2 space-y-2 rounded-xl bg-brand-blue-softer p-3">
+            <div className="mt-2 space-y-2 rounded-lg bg-surface p-3">
               <div className="flex flex-wrap gap-1.5">
                 <ProvenanceBadge kind="fact" />
                 {isPrediction && <ProvenanceBadge kind="prediction" />}

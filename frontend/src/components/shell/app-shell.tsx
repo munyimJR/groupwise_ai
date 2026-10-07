@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowLeftRight,
   Bell,
   BookOpen,
   ChevronDown,
@@ -10,6 +9,7 @@ import {
   LayoutDashboard,
   Lightbulb,
   LogOut,
+  MoreHorizontal,
   Plus,
   Receipt,
   Scale,
@@ -84,14 +84,13 @@ function groupNav(id: string): { title: string; items: NavItem[] }[] {
       ],
     },
     {
-      title: "Intelligence",
+      title: "Planning",
       items: [
         { href: `/g/${id}/insights`, label: "Insights", icon: Lightbulb },
         { href: `/g/${id}/forecast`, label: "Forecast", icon: TrendingUp },
         { href: `/g/${id}/goals`, label: "Goals", icon: Target },
         { href: `/g/${id}/what-if`, label: "What-If", icon: FlaskConical },
         { href: `/g/${id}/ask`, label: "Ask GroupWise", icon: Sparkles, badge: "AI" },
-        { href: `/g/${id}/dynamics`, label: "Group dynamics", icon: ArrowLeftRight },
       ],
     },
     { title: "Group", items: [{ href: `/g/${id}/members`, label: "Members & invite", icon: UserPlus }] },
@@ -113,13 +112,13 @@ function GroupSwitcher({ currentId, className }: { currentId: string | null; cla
           <button
             type="button"
             className={cn(
-              "flex w-full min-w-0 items-center gap-2 rounded-xl border border-line bg-white px-3 py-2 text-left hover:border-brand-blue/40",
+              "flex w-full min-w-0 items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 text-left hover:border-brand-blue/40",
               className,
             )}
           />
         }
       >
-        <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-brand-blue-soft text-brand-blue">
+        <span className="grid size-7 shrink-0 place-items-center rounded-md bg-surface text-brand-blue">
           <Users className="size-4" aria-hidden />
         </span>
         <span className="min-w-0 flex-1">
@@ -208,7 +207,7 @@ function Sidebar({ groupId }: { groupId: string | null }) {
     { href: "/how-it-works", label: "How the AI works", icon: BookOpen },
   ];
   return (
-    <aside className="sticky top-0 hidden h-dvh w-[264px] shrink-0 flex-col border-r border-line bg-white lg:flex" aria-label="Sidebar">
+    <aside className="sticky top-0 hidden h-dvh w-[240px] shrink-0 flex-col border-r border-line bg-white lg:flex" aria-label="Sidebar">
       <div className="px-5 pb-4 pt-5">
         <Link href={groupId ? `/g/${groupId}` : "/groups"} aria-label="GroupWise AI home">
           <Logo />
@@ -253,13 +252,13 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
-      className={cn(
-        "relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
-        active ? "bg-brand-blue-soft font-semibold text-brand-blue-deep" : "text-ink hover:bg-surface",
+            className={cn(
+        "relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+        active ? "bg-surface font-semibold text-ink" : "text-ink-muted hover:bg-surface hover:text-ink",
       )}
     >
-      {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-brand-yellow-strong" aria-hidden />}
-      <Icon className={cn("size-[18px]", active ? "text-brand-blue" : "text-ink-muted")} aria-hidden />
+      {active && <span className="absolute inset-y-2 left-0 w-0.5 rounded-r-full bg-brand-yellow-strong" aria-hidden />}
+      <Icon className={cn("size-[17px]", active ? "text-brand-blue" : "text-ink-muted")} aria-hidden />
       {item.label}
       {item.badge && <span className="ml-auto rounded-md bg-brand-yellow px-1.5 py-0.5 text-xs font-bold text-ink">{item.badge}</span>}
     </Link>
@@ -271,10 +270,10 @@ function BottomNav({ groupId }: { groupId: string | null }) {
   const items: (NavItem & { primary?: boolean })[] = groupId
     ? [
         { href: `/g/${groupId}`, label: "Home", icon: Home, exact: true },
-        { href: "/groups", label: "Groups", icon: Users, exact: true },
+        { href: `/g/${groupId}/transactions`, label: "Activity", icon: Receipt },
         { href: `/g/${groupId}/add`, label: "Add", icon: Plus, primary: true },
-        { href: `/g/${groupId}/insights`, label: "Insights", icon: Lightbulb },
-        { href: `/g/${groupId}/goals`, label: "Goals", icon: Target },
+        { href: `/g/${groupId}/balances`, label: "Balances", icon: Scale },
+        { href: `/g/${groupId}/insights`, label: "More", icon: MoreHorizontal },
       ]
     : [
         { href: "/groups", label: "Groups", icon: Users, exact: true },
@@ -282,7 +281,7 @@ function BottomNav({ groupId }: { groupId: string | null }) {
         { href: "/profile", label: "Profile", icon: User },
       ];
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 backdrop-blur lg:hidden" aria-label="Primary">
+    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white lg:hidden" aria-label="Primary">
       <ul className="mx-auto flex max-w-md items-end justify-around px-2 pt-1.5">
         {items.map((item) => {
           const active = isActive(pathname, item);
@@ -292,7 +291,7 @@ function BottomNav({ groupId }: { groupId: string | null }) {
               <li key={item.href} className="-mt-5">
                 <Link
                   href={item.href}
-                  className="grid size-14 place-items-center rounded-2xl bg-brand-yellow text-ink shadow-[var(--shadow-lift)] ring-4 ring-white active:scale-95"
+                  className="grid size-12 place-items-center rounded-xl bg-brand-yellow text-ink shadow-[var(--shadow-lift)] ring-3 ring-white active:scale-95"
                   aria-label="Add expense"
                 >
                   <Plus className="size-6" strokeWidth={2.5} aria-hidden />
@@ -304,9 +303,9 @@ function BottomNav({ groupId }: { groupId: string | null }) {
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={cn("flex min-w-14 flex-col items-center gap-0.5 rounded-xl px-2 pb-1.5 pt-1 text-xs font-semibold", active ? "text-brand-blue" : "text-ink-muted")}
+                className={cn("flex min-w-14 flex-col items-center gap-0.5 rounded-lg px-2 pb-1.5 pt-1 text-xs font-semibold", active ? "text-brand-blue" : "text-ink-muted")}
               >
-                <span className={cn("grid h-7 w-12 place-items-center rounded-full", active && "bg-brand-blue-soft")}>
+                <span className="grid h-7 w-12 place-items-center">
                   <Icon className="size-5" aria-hidden />
                 </span>
                 {item.label}
@@ -351,7 +350,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Sidebar groupId={groupId} />
       <div className="flex min-w-0 flex-1 flex-col">
         <DemoBanner />
-        <header className="sticky top-[env(safe-area-inset-top)] z-30 border-b border-line bg-white/95 backdrop-blur">
+        <header className="sticky top-[env(safe-area-inset-top)] z-30 border-b border-line bg-white">
           <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-3 px-4 sm:px-6">
             <Link href={groupId ? `/g/${groupId}` : "/groups"} className="tap-target lg:hidden" aria-label="GroupWise AI home">
               <LogoMark className="size-9" />

@@ -21,11 +21,7 @@ export function CardHeading({ title, subtitle, icon: Icon, action, className }: 
   return (
     <div className={cn("mb-3 flex items-start justify-between gap-3", className)}>
       <div className="flex min-w-0 items-start gap-2.5">
-        {Icon && (
-          <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-brand-blue-soft text-brand-blue">
-            <Icon className="size-4" aria-hidden />
-          </span>
-        )}
+        {Icon && <Icon className="mt-1 size-4 shrink-0 text-brand-blue" aria-hidden />}
         <div className="min-w-0">
           <h2 className="text-[15px] font-bold leading-tight text-ink">{title}</h2>
           {subtitle && <p className="mt-0.5 text-xs text-ink-muted">{subtitle}</p>}
@@ -40,8 +36,8 @@ export function PageHeader({ title, subtitle, actions, eyebrow }: { title: strin
   return (
     <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        {eyebrow && <p className="mb-1 text-xs font-semibold uppercase tracking-[0.1em] text-brand-blue">{eyebrow}</p>}
-        <h1 className="text-2xl font-extrabold leading-tight text-ink sm:text-[28px]">{title}</h1>
+        {eyebrow && <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">{eyebrow}</p>}
+        <h1 className="text-2xl font-bold leading-tight text-ink sm:text-[28px]">{title}</h1>
         {subtitle && <p className="mt-1 max-w-2xl text-sm text-ink-muted">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
@@ -119,9 +115,9 @@ export function AvatarStack({ members, max = 4 }: { members: { name: string; col
 
 export function EmptyState({ icon: Icon = Info, title, body, action }: { icon?: LucideIcon; title: string; body?: string; action?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line bg-white/60 px-6 py-10 text-center">
-      <span className="mb-3 grid size-12 place-items-center rounded-2xl bg-brand-yellow-soft text-brand-blue-deep">
-        <Icon className="size-6" aria-hidden />
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line bg-transparent px-6 py-10 text-center">
+      <span className="mb-3 grid size-10 place-items-center rounded-lg bg-surface text-brand-blue-deep">
+        <Icon className="size-5" aria-hidden />
       </span>
       <p className="font-bold text-ink">{title}</p>
       {body && <p className="mt-1 max-w-sm text-sm text-ink-muted">{body}</p>}
@@ -166,7 +162,7 @@ export function LoadingBlock({ rows = 3, className }: { rows?: number; className
 
 export function StatTile({ label, value, sub, icon: Icon, accent = false, className }: { label: string; value: React.ReactNode; sub?: React.ReactNode; icon?: LucideIcon; accent?: boolean; className?: string }) {
   return (
-    <div className={cn("card-surface flex min-w-0 flex-col gap-1.5 p-4", accent && "border-brand-yellow-strong/40 bg-brand-yellow-soft", className)}>
+    <div className={cn("card-surface flex min-w-0 flex-col gap-1.5 p-4", accent && "border-t-2 border-t-brand-yellow-strong", className)}>
       <div className="flex items-center gap-1.5 text-xs font-semibold text-ink-muted">
         {Icon && <Icon className="size-3.5 text-brand-blue" aria-hidden />}
         {label}

@@ -26,7 +26,7 @@ const pct = (v: number, d = 1) => `${(v * 100).toFixed(d)}%`;
 const FLOW = [
   { icon: Database, title: "Your group's data", body: "Expenses, splits, settlements, goals (PostgreSQL / Supabase)" },
   { icon: Calculator, title: "Deterministic finance", body: "Exact balances & debt simplification — not AI" },
-  { icon: Cpu, title: "Analytics & ML", body: "Categorizer · anomaly detector · forecast · goal simulation · dynamics" },
+  { icon: Cpu, title: "Analytics & ML", body: "Categorizer · anomaly detector · forecast · goal simulation" },
   { icon: Scale, title: "Structured facts", body: "Typed as fact / prediction / assumption / recommendation" },
   { icon: Bot, title: "LLM explanation layer", body: "Words only — every figure is re-checked against the facts" },
   { icon: UserCheck, title: "You decide", body: "Review, accept or dismiss. Nothing is automatic." },
@@ -198,7 +198,7 @@ export default function HowItWorksPage() {
             { icon: Scale, t: "Transparency", b: "Facts, model predictions, assumptions, AI-worded explanations and recommendations are labelled differently." },
             { icon: UserCheck, t: "Human oversight", b: "AI recommends; people decide. Unusual expenses are flagged for review, never blocked." },
             { icon: ShieldCheck, t: "AI security", b: "Out-of-scope and prompt-injection requests are caught; expense text is treated as data; unverifiable numbers are rejected." },
-            { icon: FlaskConical, t: "No overclaiming", b: "Projections say “projected”; likelihoods are simulations; the health score is a labelled prototype indicator." },
+            { icon: FlaskConical, t: "No overclaiming", b: "Projections say “projected”; likelihoods are simulations; What-If results are scenarios, not measured savings." },
           ].map((x) => (
             <div key={x.t} className="card-surface p-5">
               <x.icon className="size-5 text-brand-blue" aria-hidden />

@@ -84,7 +84,6 @@ export default function ProfilePage() {
           <ul className="space-y-2 text-sm text-ink">
             <li>• This prototype runs on synthetic data — no real customer information is used.</li>
             <li>• AI explains computed facts; it never moves money, blocks expenses or makes decisions for you.</li>
-            <li>• Group dynamics analyse observable payments only — never personality, intent or financial status.</li>
             <li>• Expense descriptions are treated as data; the AI copilot cannot be instructed through them.</li>
           </ul>
           <LinkButton href="/how-it-works" variant="soft" className="mt-4">
