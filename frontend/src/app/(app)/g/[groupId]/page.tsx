@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight, ArrowRight, CalendarClock, Lightbulb, Receipt, Target, TrendingUp, Wallet } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, CalendarClock, HeartPulse, Lightbulb, Receipt, Target, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -14,8 +14,45 @@ import { BalanceTag, Card, CardHeading, Delta, EmptyState, ErrorState, LinkButto
 import { Skeleton } from "@/components/ui/skeleton";
 import { taka } from "@/lib/format";
 import { useDashboard } from "@/lib/queries";
+import type { Health } from "@/lib/types";
 
 const TYPE_LABEL: Record<string, string> = { friends: "Friends", roommates: "Roommates", trip: "Trip", event: "Event", other: "Group" };
+
+/** SVG ring that visualises a 0-100 health score. */
+function HealthRing({ score }: { score: number }) {
+  const r = 22;
+  const circ = 2 * Math.PI * r;
+  const dash = (score / 100) * circ;
+  const color = score >= 70 ? "#22c55e" : score >= 45 ? "#f59e0b" : "#ef4444";
+  return (
+    <svg width={56} height={56} viewBox="0 0 56 56" className="shrink-0" aria-hidden>
+      <circle cx={28} cy={28} r={r} fill="none" stroke="#f1f4f8" strokeWidth={6} />
+      <circle
+        cx={28} cy={28} r={r} fill="none"
+        stroke={color} strokeWidth={6}
+        strokeDasharray={`${dash} ${circ}`}
+        strokeLinecap="round"
+        transform="rotate(-90 28 28)"
+      />
+      <text x={28} y={32} textAnchor="middle" fontSize={13} fontWeight={700} fill={color}>{score}</text>
+    </svg>
+  );
+}
+
+/** Expandable factor list for the health score. */
+function HealthExplainer({ health }: { health: Health }) {
+  if (!health.factors?.length) return null;
+  return (
+    <ul className="mt-1.5 space-y-0.5">
+      {health.factors.slice(0, 3).map((f) => (
+        <li key={f.key} className="flex items-center justify-between gap-1 text-[11px] text-ink-muted">
+          <span className="truncate">{f.label}</span>
+          <span className="font-semibold tabular-nums">{f.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function DashboardPage() {
   const { groupId } = useParams<{ groupId: string }>();
