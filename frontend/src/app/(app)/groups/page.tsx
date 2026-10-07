@@ -8,6 +8,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AvatarStack, BalanceTag, EmptyState, ErrorState, LoadingBlock, PageHeader } from "@/components/common/primitives";
+import { HoverLift } from "@/components/common/motion";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -181,34 +182,36 @@ export default function GroupsPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {data.map((g) => (
-            <Link key={g.id} href={`/g/${g.id}`} className="card-surface group flex flex-col gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)]">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-xs font-bold uppercase tracking-wider text-brand-blue">{TYPES.find((t) => t.value === g.group_type)?.label ?? "Group"}</p>
-                  <h2 className="truncate text-lg font-extrabold text-ink group-hover:text-brand-blue-deep">{g.name}</h2>
-                  {g.description && <p className="line-clamp-2 text-xs text-ink-muted">{g.description}</p>}
+            <HoverLift key={g.id} className="h-full">
+              <Link href={`/g/${g.id}`} className="card-surface group flex h-full flex-col gap-4 p-5 transition-shadow hover:shadow-[var(--shadow-lift)]">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold uppercase tracking-wider text-brand-blue">{TYPES.find((t) => t.value === g.group_type)?.label ?? "Group"}</p>
+                    <h2 className="truncate text-lg font-extrabold text-ink group-hover:text-brand-blue-deep">{g.name}</h2>
+                    {g.description && <p className="line-clamp-2 text-xs text-ink-muted">{g.description}</p>}
+                  </div>
+                  <AvatarStack members={g.members} />
                 </div>
-                <AvatarStack members={g.members} />
-              </div>
-              <div className="grid grid-cols-2 gap-3 rounded-xl bg-surface p-3">
-                <div>
-                  <p className="text-xs text-ink-muted">Spent · 30 days</p>
-                  <p className="tabular text-lg font-extrabold text-ink">{taka(g.total_30d)}</p>
+                <div className="grid grid-cols-2 gap-3 rounded-xl bg-surface p-3">
+                  <div>
+                    <p className="text-xs text-ink-muted">Spent · 30 days</p>
+                    <p className="tabular text-lg font-extrabold text-ink">{taka(g.total_30d)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-ink-muted">Your balance</p>
+                    <BalanceTag net={g.my_net} size="sm" you />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-ink-muted">Your balance</p>
-                  <BalanceTag net={g.my_net} size="sm" you />
+                <div className="flex items-center justify-between text-xs text-ink-muted">
+                  <span>{g.last_activity ? `Last activity ${relativeTime(g.last_activity)}` : "No expenses yet"}</span>
+                  {g.flagged_count > 0 && (
+                    <span className="inline-flex items-center gap-1 font-semibold text-bad">
+                      <AlertTriangle className="size-3.5" aria-hidden /> {g.flagged_count} to review
+                    </span>
+                  )}
                 </div>
-              </div>
-              <div className="flex items-center justify-between text-xs text-ink-muted">
-                <span>{g.last_activity ? `Last activity ${relativeTime(g.last_activity)}` : "No expenses yet"}</span>
-                {g.flagged_count > 0 && (
-                  <span className="inline-flex items-center gap-1 font-semibold text-bad">
-                    <AlertTriangle className="size-3.5" aria-hidden /> {g.flagged_count} to review
-                  </span>
-                )}
-              </div>
-            </Link>
+              </Link>
+            </HoverLift>
           ))}
         </div>
       )}

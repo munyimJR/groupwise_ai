@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MotionConfig } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 
@@ -32,10 +33,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       <AuthProvider>
-        <TooltipProvider delay={150}>
-          {children}
-          <Toaster position="top-center" richColors closeButton toastOptions={{ className: "font-sans" }} />
-        </TooltipProvider>
+        <MotionConfig reducedMotion="user">
+          <TooltipProvider delay={150}>
+            {children}
+            <Toaster position="top-center" richColors closeButton toastOptions={{ className: "font-sans" }} />
+          </TooltipProvider>
+        </MotionConfig>
       </AuthProvider>
     </QueryClientProvider>
   );

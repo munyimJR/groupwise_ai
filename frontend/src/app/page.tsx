@@ -21,6 +21,7 @@ import Link from "next/link";
 import { DemoButton } from "@/components/auth/demo-button";
 import { Logo } from "@/components/brand/logo";
 import { LinkButton } from "@/components/common/primitives";
+import { HoverLift } from "@/components/common/motion";
 import { useAuth } from "@/lib/auth";
 
 const PIPELINE = [
@@ -97,15 +98,21 @@ export default function LandingPage() {
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 {status === "authenticated" ? (
-                  <LinkButton href="/groups" size="lg">
-                    Open my dashboard <ArrowRight className="size-4" aria-hidden />
-                  </LinkButton>
+                  <HoverLift>
+                    <LinkButton href="/groups" size="lg">
+                      Open my dashboard <ArrowRight className="size-4" aria-hidden />
+                    </LinkButton>
+                  </HoverLift>
                 ) : (
                   <>
-                    <DemoButton />
-                    <LinkButton href="/signup" size="lg" variant="outline">
-                      Create a free account
-                    </LinkButton>
+                    <HoverLift>
+                      <DemoButton />
+                    </HoverLift>
+                    <HoverLift>
+                      <LinkButton href="/signup" size="lg" variant="outline">
+                        Create a free account
+                      </LinkButton>
+                    </HoverLift>
                   </>
                 )}
               </div>
@@ -169,14 +176,16 @@ export default function LandingPage() {
             <h2 className="mt-2 max-w-2xl text-3xl font-extrabold text-ink">Purposeful AI — each feature does one job, and says how it did it.</h2>
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {FEATURES.map((f) => (
-                <article key={f.title} className="card-surface flex flex-col p-5">
+                <HoverLift key={f.title} className="h-full">
+                  <article className="card-surface flex h-full flex-col p-5">
                   <span className="grid size-9 place-items-center rounded-lg bg-surface text-brand-blue">
                     <f.icon className="size-5" aria-hidden />
                   </span>
                   <h3 className="mt-3 text-base font-bold text-ink">{f.title}</h3>
                   <p className="mt-1 text-[13px] text-ink-muted">{f.body}</p>
                   <p className="mt-auto pt-3 text-xs font-semibold text-brand-blue-deep">{f.method}</p>
-                </article>
+                  </article>
+                </HoverLift>
               ))}
             </div>
           </div>
@@ -215,11 +224,15 @@ export default function LandingPage() {
                 <p className="mt-2 text-sm leading-6 text-ink-muted">Explore three synthetic groups with shared expenses, balances and goals ready to review.</p>
               </div>
               {status === "authenticated" ? (
-                <LinkButton href="/groups" size="lg">
-                  Open my dashboard <ArrowRight className="size-4" aria-hidden />
-                </LinkButton>
+                <HoverLift>
+                  <LinkButton href="/groups" size="lg">
+                    Open my dashboard <ArrowRight className="size-4" aria-hidden />
+                  </LinkButton>
+                </HoverLift>
               ) : (
-                <DemoButton />
+                <HoverLift>
+                  <DemoButton />
+                </HoverLift>
               )}
             </div>
           </div>

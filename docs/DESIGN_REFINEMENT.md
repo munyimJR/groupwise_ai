@@ -46,3 +46,7 @@ The follow-up visual pass keeps the same brand but removes visual weight across 
 The landing hero now leads with one direct promise — “Shared money, made clear.” — followed by a short description and a compact three-step routine: record, understand and decide. The previous five-step copy stack and yellow underline were removed so the text side reads quickly at a glance while the adjacent panel reinforces user control.
 
 The closing call-to-action now uses a contained light-blue panel with a shorter invitation and a single clear action. The footer keeps the prototype disclosure visible but gives it smaller type and more breathing room beside the brand mark.
+
+## Motion restraint
+
+Framer Motion is limited to a shared `HoverLift` used on primary actions and clickable cards. The lift is a small spring-based rise with a restrained press scale, while the app-wide `MotionConfig` respects the user's reduced-motion preference. No page transitions or decorative looping motion were added.
